@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\" | Where-Object { $_.PSIsContainer } | Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\" -File | Where-Object { $_.Extension -in \".tf\",\".tfvars\" } | Select-Object @{N=\"Path\";E={$_.FullName.Replace\\(\"C:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\\",\"\"\\)}} | Sort-Object Path)"
+    ]
+  }
+}
