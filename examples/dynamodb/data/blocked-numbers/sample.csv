@@ -1,0 +1,4 @@
+phone_number,reason,blocked_date
++15550000000,spam,2024-01-10
++15551111111,fraud,2024-02-15
++15552222222,robocall,2024-03-01

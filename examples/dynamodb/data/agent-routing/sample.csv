@@ -1,0 +1,5 @@
+agent_id,skill,priority_level,queue_id
+agent-001,billing,1,bbbbbbbb-0000-0000-0000-bbbbbbbbbbbb
+agent-001,general,2,cccccccc-0000-0000-0000-cccccccccccc
+agent-002,billing,1,bbbbbbbb-0000-0000-0000-bbbbbbbbbbbb
+agent-003,general,1,cccccccc-0000-0000-0000-cccccccccccc

@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# GitLab CI/CD — automated CSV upload to S3
+#
+# Required CI/CD variables (Settings → CI/CD → Variables):
+#   AWS_ROLE_ARN        — from Terraform output: gitlab_upload_role_arn
+#   AWS_DEFAULT_REGION  — e.g. us-east-1
+#   CSV_BUCKET_NAME     — from Terraform output: csv_bucket_name
+#
+# How it works:
+#   1. Any change to a .csv file under data/ on the main branch triggers this job.
+#   2. The job uses GitLab's OIDC token to assume the AWS IAM role — no
+#      long-lived access keys are stored in GitLab.
+#   3. Each CSV is uploaded to s3://<bucket>/<table-folder>/<filename>.
+#   4. S3 fires a notification → Lambda routes the file → DynamoDB is updated.
+#
+# Folder → table mapping (must match keys in the Terraform tables variable):
+#   data/phone-routing/*.csv    → phone-routing table
+#   data/blocked-numbers/*.csv  → blocked-numbers table
+#   data/agent-routing/*.csv    → agent-routing table
+# ---------------------------------------------------------------------------
+
+stages:
+  - upload
+
+upload-csv:
+  stage: upload
+  image: amazon/aws-cli:latest
+
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com   # must match gitlab_ci_upload.gitlab_url in Terraform
+
+  script:
+    # Exchange the OIDC token for temporary AWS credentials
+    - |
+      CREDS=$(aws sts assume-role-with-web-identity \
+        --role-arn            "$AWS_ROLE_ARN" \
+        --role-session-name   "gitlab-csv-upload-${CI_PIPELINE_ID}" \
+        --web-identity-token  "$GITLAB_OIDC_TOKEN" \
+        --duration-seconds    3600 \
+        --output json)
+      export AWS_ACCESS_KEY_ID=$(echo "$CREDS"     | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['AccessKeyId'])")
+      export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['SecretAccessKey'])")
+      export AWS_SESSION_TOKEN=$(echo "$CREDS"     | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['SessionToken'])")
+
+    # Upload every CSV file to the matching S3 folder
+    # data/<table-key>/file.csv  →  s3://<bucket>/<table-key>/file.csv
+    - |
+      for table_dir in data/*/; do
+        table_key=$(basename "$table_dir")
+        for csv_file in "${table_dir}"*.csv; do
+          [ -f "$csv_file" ] || continue
+          dest="s3://${CSV_BUCKET_NAME}/${table_key}/$(basename "$csv_file")"
+          echo "Uploading $csv_file → $dest"
+          aws s3 cp "$csv_file" "$dest"
+        done
+      done
+
+  rules:
+    # Only run on the main branch when a CSV file changes
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - "data/**/*.csv"
