@@ -3,31 +3,12 @@
 # ---------------------------------------------------------------------------
 
 variable "project_name" {
-  description = "Short project/team name used as a resource name prefix (e.g. tfc)."
+  description = "Short project name used as a resource name prefix (e.g. ls)."
   type        = string
-}
-
-variable "account" {
-  description = "AWS account short-name used in resource naming (e.g. retail)."
-  type        = string
-}
-
-variable "lob" {
-  description = "Line-of-business identifier used in resource naming (e.g. tccivr)."
-  type        = string
-}
-
-variable "sdlc_env" {
-  description = "Deployment environment: prod, qa, or test."
-  type        = string
-  validation {
-    condition     = contains(["prod", "qa", "test"], var.sdlc_env)
-    error_message = "sdlc_env must be prod, qa, or test."
-  }
 }
 
 variable "aws_region_abbr" {
-  description = "Short AWS region abbreviation used in resource naming (e.g. ue1 for us-east-1)."
+  description = "Short AWS region abbreviation used in resource naming (e.g. uw2 for us-west-2)."
   type        = string
 }
 
@@ -38,13 +19,13 @@ variable "aws_region_abbr" {
 variable "tables" {
   description = <<-EOT
     Map of DynamoDB table definitions. Each key:
-      - becomes the table name suffix: <name_prefix>-<key>
-      - becomes the S3 folder you upload CSVs into: <key>/your-file.csv
+      - becomes the table name: <project_name>-connect-<key>-<aws_region_abbr>
+      - becomes the S3 folder for CSV uploads: <key>/your-file.csv
 
     billing_mode: PAY_PER_REQUEST (default) or PROVISIONED.
     read_capacity / write_capacity: required only when billing_mode is PROVISIONED.
     csv_number_attributes: column names in the CSV to store as Number type; all others default to String.
-    projection_type on GSIs: ALL, KEYS_ONLY, or INCLUDE.
+    sync_mode: when true, rows not in the CSV are deleted (full replace). When false, only upserts.
   EOT
   type = map(object({
     hash_key                       = string

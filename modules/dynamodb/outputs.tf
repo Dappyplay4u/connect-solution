@@ -22,7 +22,7 @@ output "table_ids" {
 # ---------------------------------------------------------------------------
 
 output "csv_bucket_name" {
-  description = "Name of the shared S3 bucket. Upload CSVs into a sub-folder matching the table key (e.g. phone-routing/data.csv)."
+  description = "Name of the shared S3 bucket. Upload CSVs into a sub-folder matching the table key (e.g. agent-configuration/data.csv)."
   value       = aws_s3_bucket.csv.bucket
 }
 
@@ -57,13 +57,4 @@ output "csv_loader_log_group_name" {
 output "gitlab_upload_role_arn" {
   description = "ARN of the IAM role GitLab CI/CD assumes to upload CSVs. Set AWS_ROLE_ARN to this value in your GitLab CI/CD variables."
   value       = local.enable_gitlab_upload ? aws_iam_role.gitlab_csv_upload[0].arn : null
-}
-
-# ---------------------------------------------------------------------------
-# Metadata
-# ---------------------------------------------------------------------------
-
-output "name_prefix" {
-  description = "Computed name prefix shared by all resources in this module."
-  value       = local.name_prefix
 }

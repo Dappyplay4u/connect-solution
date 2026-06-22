@@ -1,37 +1,22 @@
 variable "aws_region" {
-  description = "AWS region to deploy into (e.g. us-east-1)."
+  description = "AWS region to deploy into (e.g. us-west-2)."
   type        = string
-  default     = "us-east-1"
+  default     = "us-west-2"
 }
 
 variable "project_name" {
-  description = "Short project/team name (e.g. tfc)."
-  type        = string
-}
-
-variable "account" {
-  description = "AWS account short-name (e.g. retail)."
-  type        = string
-}
-
-variable "lob" {
-  description = "Line-of-business identifier (e.g. tccivr)."
-  type        = string
-}
-
-variable "sdlc_env" {
-  description = "Deployment environment: prod, qa, or test."
+  description = "Short project name used as a resource name prefix (e.g. ls)."
   type        = string
 }
 
 variable "aws_region_abbr" {
-  description = "Short region abbreviation (e.g. ue1 for us-east-1)."
+  description = "Short region abbreviation (e.g. uw2 for us-west-2)."
   type        = string
-  default     = "ue1"
+  default     = "uw2"
 }
 
 variable "kms_master_key_id" {
-  description = "Optional KMS key ARN for encrypting the table, S3 bucket, and Lambda logs."
+  description = "Optional KMS key ARN for encrypting the tables, S3 bucket, and Lambda logs."
   type        = string
   default     = null
 }
@@ -42,37 +27,14 @@ variable "gitlab_project_path" {
 }
 
 # ---------------------------------------------------------------------------
-# Tags
+# Required enterprise tags
 # ---------------------------------------------------------------------------
 
-variable "business_application_id" {
-  type = string
-}
-
-variable "cost_center" {
-  type = string
-}
-
-variable "created_by" {
-  type = string
-}
-
-variable "technical_support_by" {
-  type = string
-}
-
-variable "application_group" {
-  type = string
-}
-
-variable "technical_environment" {
-  type = string
-}
-
-variable "security_data_application" {
-  type = string
-}
-
-variable "business_application_code" {
-  type = string
-}
+variable "business_application_id" { type = string }
+variable "cost_center" { type = string }
+variable "created_by" { type = string }
+variable "technical_support_by" { type = string }
+variable "application_group" { type = string }
+variable "technical_environment" { type = string }
+variable "security_data_application" { type = string }
+variable "business_application_code" { type = string }

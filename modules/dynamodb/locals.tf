@@ -1,20 +1,16 @@
 locals {
   prefix          = var.project_name
-  account         = var.account
-  lob             = var.lob
-  sdlc_env        = var.sdlc_env
   aws_region_abbr = var.aws_region_abbr
 
-  name_prefix = "${local.prefix}-${local.account}-connect-${local.lob}-${local.sdlc_env}-${local.aws_region_abbr}"
+  # Shared prefix for all non-table resources (S3, Lambda, IAM, CloudWatch).
+  # Tables use: ${local.prefix}-connect-${each.key}-${local.aws_region_abbr}
+  name_prefix = "${local.prefix}-connect-${local.aws_region_abbr}"
 
   account_id = data.aws_caller_identity.current.account_id
   region     = data.aws_region.current.region
   partition  = data.aws_partition.current.partition
 
-  common_tags = merge(var.tags, {
-    sdlc_env    = local.sdlc_env
-    name_prefix = local.name_prefix
-  })
+  common_tags = var.tags
 
   # Shared resource names — no table suffix since these serve all tables
   csv_bucket_name = "${local.name_prefix}-ddb-csv"
@@ -28,14 +24,12 @@ locals {
   # GitLab OIDC upload role
   enable_gitlab_upload = var.gitlab_ci_upload.enabled
   create_oidc_provider = local.enable_gitlab_upload && var.gitlab_oidc_provider_arn == null
-  # Strip protocol from URL to get the host used in OIDC condition keys
   gitlab_oidc_host     = replace(replace(coalesce(var.gitlab_ci_upload.gitlab_url, "https://gitlab.com"), "https://", ""), "http://", "")
   oidc_provider_arn    = local.create_oidc_provider ? aws_iam_openid_connect_provider.gitlab[0].arn : coalesce(var.gitlab_oidc_provider_arn, "")
   gitlab_role_name     = "${local.name_prefix}-ddb-gitlab-upload-role"
   gitlab_policy_name   = "${local.name_prefix}-ddb-gitlab-upload-policy"
 
   # Per-table key attribute maps (hash key + range key + GSI keys, deduplicated by name).
-  # DynamoDB only allows attribute blocks for attributes used as keys.
   table_attributes = {
     for k, v in var.tables : k => merge(
       { (v.hash_key) = v.hash_key_type },
@@ -50,10 +44,9 @@ locals {
   }
 
   # Routing config passed to Lambda as TABLE_ROUTING env var.
-  # Lambda extracts the S3 folder name and looks up the matching entry.
   table_routing = jsonencode({
     for k, v in var.tables : k => {
-      table_name        = "${local.name_prefix}-${k}"
+      table_name        = "${local.prefix}-connect-${k}-${local.aws_region_abbr}"
       hash_key          = v.hash_key
       range_key         = coalesce(v.range_key, "")
       number_attributes = v.csv_number_attributes

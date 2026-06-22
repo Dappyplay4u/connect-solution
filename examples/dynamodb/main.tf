@@ -2,52 +2,58 @@ module "connect_tables" {
   source = "../../modules/dynamodb"
 
   # ---------------------------------------------------------------------------
-  # Naming
+  # Naming — produces: ls-connect-<table-key>-uw2
   # ---------------------------------------------------------------------------
   project_name    = var.project_name
-  account         = var.account
-  lob             = var.lob
-  sdlc_env        = var.sdlc_env
   aws_region_abbr = var.aws_region_abbr
 
   # ---------------------------------------------------------------------------
-  # Tables
-  # Each key becomes:
-  #   - the table name suffix:  <name_prefix>-<key>
-  #   - the S3 upload folder:   <key>/your-file.csv
+  # Tables — each key maps to a Connect configuration table:
+  #   table name:   <project_name>-connect-<key>-<aws_region_abbr>
+  #   S3 folder:    <key>/your-file.csv
   # ---------------------------------------------------------------------------
   tables = {
 
-    phone-routing = {
-      hash_key      = "phone_number"
-      hash_key_type = "S"
-      billing_mode  = "PAY_PER_REQUEST"
-
-      global_secondary_indexes = [
-        {
-          name            = "contact-flow-index"
-          hash_key        = "contact_flow_id"
-          hash_key_type   = "S"
-          projection_type = "ALL"
-        }
-      ]
-    }
-
-    blocked-numbers = {
-      hash_key      = "phone_number"
+    # ls-connect-agent-configuration-uw2
+    "agent-configuration" = {
+      hash_key      = "AgentId"
       hash_key_type = "S"
       billing_mode  = "PAY_PER_REQUEST"
     }
 
-    agent-routing = {
-      hash_key      = "agent_id"
+    # ls-connect-DNIS-mapping-uw2
+    "DNIS-mapping" = {
+      hash_key      = "DNIS"
       hash_key_type = "S"
-      range_key     = "skill"
-      range_key_type = "S"
       billing_mode  = "PAY_PER_REQUEST"
+    }
 
-      # priority_level values in the CSV are numbers
-      csv_number_attributes = ["priority_level"]
+    # ls-connect-ivr-parameters--uw2  (trailing dash in key preserves double-dash)
+    "ivr-parameters-" = {
+      hash_key      = "ParameterKey"
+      hash_key_type = "S"
+      billing_mode  = "PAY_PER_REQUEST"
+    }
+
+    # ls-connect-ivr-pilot-phone-numbers-uw2
+    "ivr-pilot-phone-numbers" = {
+      hash_key      = "PhoneNumber"
+      hash_key_type = "S"
+      billing_mode  = "PAY_PER_REQUEST"
+    }
+
+    # ls-connect-office-hours--uw2  (trailing dash in key preserves double-dash)
+    "office-hours-" = {
+      hash_key      = "OfficeId"
+      hash_key_type = "S"
+      billing_mode  = "PAY_PER_REQUEST"
+    }
+
+    # ls-connect-prompts-uw2
+    "prompts" = {
+      hash_key      = "PromptId"
+      hash_key_type = "S"
+      billing_mode  = "PAY_PER_REQUEST"
     }
 
   }
@@ -60,18 +66,18 @@ module "connect_tables" {
   lambda_memory_mb          = 256
   lambda_log_retention_days = 30
 
-  # Optional KMS key — pass one from the kms module if encryption is required
+  # Optional — pass a KMS key ARN from your kms module if encryption is required
   kms_master_key_id = var.kms_master_key_id
 
   # ---------------------------------------------------------------------------
   # GitLab CI/CD automated upload
-  # Terraform creates an IAM role GitLab assumes via OIDC.
+  # Creates an IAM role GitLab assumes via OIDC.
   # Set AWS_ROLE_ARN = <gitlab_upload_role_arn output> in GitLab CI/CD variables.
   # ---------------------------------------------------------------------------
   gitlab_ci_upload = {
     enabled      = true
     gitlab_url   = "https://gitlab.com"
-    project_path = var.gitlab_project_path   # e.g. "mygroup/myrepo"
+    project_path = var.gitlab_project_path
     branch       = "main"
   }
 

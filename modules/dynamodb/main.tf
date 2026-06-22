@@ -5,7 +5,7 @@
 resource "aws_dynamodb_table" "this" {
   for_each = var.tables
 
-  name           = "${local.name_prefix}-${each.key}"
+  name           = "${local.prefix}-connect-${each.key}-${local.aws_region_abbr}"
   billing_mode   = each.value.billing_mode
   hash_key       = each.value.hash_key
   range_key      = each.value.range_key
