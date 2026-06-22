@@ -5,36 +5,37 @@ variable "aws_region" {
 }
 
 variable "project_name" {
-  description = "Short project name used as a resource name prefix (e.g. ls)."
+  description = "Short project name prefix used in all resource names (e.g. ls)."
   type        = string
 }
 
 variable "aws_region_abbr" {
-  description = "Short region abbreviation (e.g. uw2 for us-west-2)."
+  description = "Short region abbreviation used in resource names (e.g. uw2 for us-west-2)."
   type        = string
   default     = "uw2"
 }
 
 variable "kms_master_key_id" {
-  description = "Optional KMS key ARN for encrypting the tables, S3 bucket, and Lambda logs."
+  description = "Optional KMS key ARN. When null, AWS-managed encryption is used."
   type        = string
   default     = null
 }
 
-variable "gitlab_project_path" {
-  description = "GitLab project path allowed to assume the CSV upload IAM role (e.g. mygroup/myrepo)."
+variable "iam_permission_boundary_arn" {
+  description = "IAM permissions boundary ARN. Required in SSO-managed enterprise accounts."
   type        = string
+  default     = null
 }
 
 # ---------------------------------------------------------------------------
 # Required enterprise tags
 # ---------------------------------------------------------------------------
 
-variable "business_application_id" { type = string }
-variable "cost_center" { type = string }
-variable "created_by" { type = string }
-variable "technical_support_by" { type = string }
-variable "application_group" { type = string }
-variable "technical_environment" { type = string }
+variable "business_application_id"   { type = string }
+variable "cost_center"               { type = string }
+variable "created_by"                { type = string }
+variable "technical_support_by"      { type = string }
+variable "application_group"         { type = string }
+variable "technical_environment"     { type = string }
 variable "security_data_application" { type = string }
 variable "business_application_code" { type = string }

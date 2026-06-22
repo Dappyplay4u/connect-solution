@@ -1,0 +1,6 @@
+ParameterKey,ParameterValue,Description
+MAX_QUEUE_WAIT_SECONDS,300,Maximum time a caller waits in queue before overflow
+AFTER_HOURS_ENABLED,true,Enable after-hours message and routing
+WELCOME_PROMPT_ID,prompt-001,ID of the welcome prompt played on answer
+HOLD_MUSIC_PROMPT_ID,prompt-002,ID of the hold music prompt
+OVERFLOW_QUEUE,AfterHoursQueue,Queue to route to when primary queue is full

@@ -1,13 +1,15 @@
 # ---------------------------------------------------------------------------
-# Naming — produces: ls-connect-<table-key>-uw2
+# Naming
+# Produces table names: ls-connect-<key>-uw2
 # ---------------------------------------------------------------------------
 project_name    = "ls"
 aws_region_abbr = "uw2"
 
 # ---------------------------------------------------------------------------
-# GitLab CI/CD
+# Optional — uncomment if your account requires a KMS key or permission boundary
 # ---------------------------------------------------------------------------
-gitlab_project_path = "mygroup/connect-config"
+# kms_master_key_id           = "arn:aws:kms:us-west-2:<account_id>:key/<key-id>"
+# iam_permission_boundary_arn = "arn:aws:iam::<account_id>:policy/EnterprisePermissionBoundary"
 
 # ---------------------------------------------------------------------------
 # Required enterprise tags

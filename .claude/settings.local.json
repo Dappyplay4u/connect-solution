@@ -4,7 +4,9 @@
       "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\" | Where-Object { $_.PSIsContainer } | Select-Object FullName)",
       "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\" -File | Where-Object { $_.Extension -in \".tf\",\".tfvars\" } | Select-Object @{N=\"Path\";E={$_.FullName.Replace\\(\"C:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\\",\"\"\\)}} | Sort-Object Path)",
       "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\modules\\\\dynamodb\")",
-      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\examples\\\\dynamodb\")"
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\examples\\\\dynamodb\")",
+      "Bash(Remove-Item -Force \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\examples\\\\dynamodb\\\\.gitlab-ci.yml\")",
+      "Bash(Remove-Item -Force \"c:\\\\Users\\\\oladapo\\\\OneDrive\\\\Desktop\\\\big-connect\\\\examples\\\\dynamodb\\\\provider.tf\")"
     ]
   }
 }

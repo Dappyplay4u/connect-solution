@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# DynamoDB Tables — one per entry in var.tables
+# DynamoDB Tables
 # ---------------------------------------------------------------------------
 
 resource "aws_dynamodb_table" "this" {
@@ -54,7 +54,7 @@ resource "aws_dynamodb_table" "this" {
 }
 
 # ---------------------------------------------------------------------------
-# S3 Bucket — single shared bucket for all tables
+# S3 Bucket — CSV ingestion point for all tables
 # ---------------------------------------------------------------------------
 
 resource "aws_s3_bucket" "csv" {
@@ -135,11 +135,12 @@ resource "aws_s3_bucket_policy" "csv" {
 }
 
 # ---------------------------------------------------------------------------
-# IAM Role for CSV Loader Lambda
+# IAM Role — Lambda execution
 # ---------------------------------------------------------------------------
 
 resource "aws_iam_role" "csv_loader" {
-  name = local.iam_role_name
+  name                 = local.iam_role_name
+  permissions_boundary = var.iam_permission_boundary_arn
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -174,6 +175,7 @@ resource "aws_iam_role_policy" "csv_loader" {
           "dynamodb:BatchWriteItem",
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
+          "dynamodb:Scan",
         ]
         Resource = [for k, v in aws_dynamodb_table.this : v.arn]
       },
@@ -220,7 +222,7 @@ resource "aws_cloudwatch_log_group" "csv_loader" {
 }
 
 # ---------------------------------------------------------------------------
-# Lambda Function — shared CSV loader for all tables
+# Lambda Function — CSV loader
 # ---------------------------------------------------------------------------
 
 resource "aws_lambda_function" "csv_loader" {
@@ -235,8 +237,6 @@ resource "aws_lambda_function" "csv_loader" {
 
   environment {
     variables = {
-      # Lambda extracts the S3 folder name from the object key and looks up
-      # the matching table config in this JSON map.
       TABLE_ROUTING = local.table_routing
     }
   }
@@ -247,7 +247,7 @@ resource "aws_lambda_function" "csv_loader" {
 }
 
 # ---------------------------------------------------------------------------
-# S3 → Lambda trigger
+# S3 → Lambda event notification
 # ---------------------------------------------------------------------------
 
 resource "aws_lambda_permission" "s3_invoke" {
@@ -269,76 +269,4 @@ resource "aws_s3_bucket_notification" "csv" {
   }
 
   depends_on = [aws_lambda_permission.s3_invoke]
-}
-
-# ---------------------------------------------------------------------------
-# GitLab OIDC — automated CSV upload (optional)
-# ---------------------------------------------------------------------------
-
-# One OIDC provider per GitLab URL per AWS account. Set
-# var.gitlab_oidc_provider_arn if one already exists in this account.
-resource "aws_iam_openid_connect_provider" "gitlab" {
-  count = local.create_oidc_provider ? 1 : 0
-
-  url             = var.gitlab_ci_upload.gitlab_url
-  client_id_list  = [var.gitlab_ci_upload.gitlab_url]
-  # Thumbprint of the GitLab TLS certificate root CA.
-  # Retrieve the current value with:
-  #   openssl s_client -servername gitlab.com -connect gitlab.com:443 2>/dev/null \
-  #     | openssl x509 -fingerprint -sha1 -noout | sed 's/.*=//' | tr -d ':'
-  thumbprint_list = ["b3dd7606d2b5a8b4a13771dbecc9ee1cecafa38a"]
-
-  tags = local.common_tags
-}
-
-resource "aws_iam_role" "gitlab_csv_upload" {
-  count = local.enable_gitlab_upload ? 1 : 0
-
-  name = local.gitlab_role_name
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Federated = local.oidc_provider_arn }
-      Action    = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringLike = {
-          # Allows any pipeline job on the specified branch of the specified project
-          "${local.gitlab_oidc_host}:sub" = "project_path:${var.gitlab_ci_upload.project_path}:ref_type:branch:ref:${var.gitlab_ci_upload.branch}"
-        }
-        StringEquals = {
-          "${local.gitlab_oidc_host}:aud" = var.gitlab_ci_upload.gitlab_url
-        }
-      }
-    }]
-  })
-
-  tags = local.common_tags
-}
-
-resource "aws_iam_role_policy" "gitlab_csv_upload" {
-  count = local.enable_gitlab_upload ? 1 : 0
-
-  name = local.gitlab_policy_name
-  role = aws_iam_role.gitlab_csv_upload[0].id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "UploadCsvToS3"
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket",
-        ]
-        Resource = [
-          aws_s3_bucket.csv.arn,
-          "${aws_s3_bucket.csv.arn}/*",
-        ]
-      }
-    ]
-  })
 }

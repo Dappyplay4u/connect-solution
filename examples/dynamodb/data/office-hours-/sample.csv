@@ -1,0 +1,5 @@
+OfficeId,OpenTime,CloseTime,Timezone,Weekdays,HolidaysClosed
+NYC-01,09:00,18:00,America/New_York,Mon-Fri,true
+LAX-01,09:00,17:00,America/Los_Angeles,Mon-Fri,true
+CHI-01,08:00,17:00,America/Chicago,Mon-Fri,true
+ATL-01,08:00,17:00,America/New_York,Mon-Fri,true

@@ -1,0 +1,5 @@
+DNIS,FlowName,QueueName,Description,Active
++18005551001,MainBillingFlow,BillingQueue,Main billing line,true
++18005551002,SalesFlow,SalesQueue,Main sales line,true
++18005551003,SupportFlow,SupportQueue,Technical support line,true
++18005551004,AfterHoursFlow,AfterHoursQueue,After hours overflow,true

@@ -1,0 +1,5 @@
+AgentId,AgentName,SkillGroup,Language,MaxConcurrentChats
+agent-001,John Smith,billing,en-US,3
+agent-002,Jane Doe,sales,en-US,2
+agent-003,Mike Johnson,billing,en-US,3
+agent-004,Sarah Williams,support,en-US,4

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Identity / naming
+# Naming
 # ---------------------------------------------------------------------------
 
 variable "project_name" {
@@ -18,14 +18,19 @@ variable "aws_region_abbr" {
 
 variable "tables" {
   description = <<-EOT
-    Map of DynamoDB table definitions. Each key:
-      - becomes the table name: <project_name>-connect-<key>-<aws_region_abbr>
-      - becomes the S3 folder for CSV uploads: <key>/your-file.csv
+    Map of DynamoDB table definitions.
 
-    billing_mode: PAY_PER_REQUEST (default) or PROVISIONED.
-    read_capacity / write_capacity: required only when billing_mode is PROVISIONED.
-    csv_number_attributes: column names in the CSV to store as Number type; all others default to String.
-    sync_mode: when true, rows not in the CSV are deleted (full replace). When false, only upserts.
+    Each key:
+      - sets the table name:   <project_name>-connect-<key>-<aws_region_abbr>
+      - sets the S3 folder:    <key>/your-file.csv
+
+    billing_mode          PAY_PER_REQUEST (default) or PROVISIONED.
+    csv_number_attributes Column names in the CSV that should be stored as
+                          DynamoDB Number type. All others default to String.
+    sync_mode             false (default) = upsert only, existing rows not in
+                          the CSV are kept.
+                          true = full replace, rows absent from the CSV are
+                          deleted after the load.
   EOT
   type = map(object({
     hash_key                       = string
@@ -80,11 +85,11 @@ variable "tables" {
 }
 
 # ---------------------------------------------------------------------------
-# Shared CSV loader settings
+# CSV loader settings
 # ---------------------------------------------------------------------------
 
 variable "kms_master_key_id" {
-  description = "ARN of a KMS key for encrypting all tables, the S3 bucket, and Lambda logs. When null, AWS-managed keys are used."
+  description = "ARN of a KMS key for encrypting tables, the S3 bucket, and Lambda logs. When null, AWS-managed keys are used."
   type        = string
   default     = null
 }
@@ -96,7 +101,7 @@ variable "csv_retention_days" {
 }
 
 variable "lambda_timeout_seconds" {
-  description = "Maximum execution time for the CSV loader Lambda in seconds."
+  description = "Maximum execution time for the CSV loader Lambda in seconds (1–900)."
   type        = number
   default     = 300
   validation {
@@ -125,30 +130,11 @@ variable "lambda_log_retention_days" {
 }
 
 # ---------------------------------------------------------------------------
-# GitLab CI/CD — automated CSV upload via OIDC
+# Enterprise / IAM governance
 # ---------------------------------------------------------------------------
 
-variable "gitlab_ci_upload" {
-  description = <<-EOT
-    When enabled, creates an IAM role that GitLab CI/CD can assume via OIDC
-    to upload CSV files to the S3 bucket without long-lived access keys.
-
-    project_path: the GitLab project path allowed to assume the role
-                  (e.g. "mygroup/myrepo"). Required when enabled = true.
-    branch:       only pipelines running on this branch can assume the role.
-    gitlab_url:   your GitLab instance URL. Defaults to https://gitlab.com.
-  EOT
-  type = object({
-    enabled      = optional(bool, false)
-    project_path = optional(string, null)
-    branch       = optional(string, "main")
-    gitlab_url   = optional(string, "https://gitlab.com")
-  })
-  default = { enabled = false }
-}
-
-variable "gitlab_oidc_provider_arn" {
-  description = "ARN of an existing GitLab OIDC provider in this account. When null and gitlab_ci_upload.enabled is true, a new provider is created. Only one OIDC provider per URL is allowed per AWS account."
+variable "iam_permission_boundary_arn" {
+  description = "ARN of an IAM permissions boundary to attach to the Lambda execution role. Required in SSO-managed enterprise accounts."
   type        = string
   default     = null
 }
@@ -158,7 +144,7 @@ variable "gitlab_oidc_provider_arn" {
 # ---------------------------------------------------------------------------
 
 variable "tags" {
-  description = "Map of tags applied to all resources. Must include the 8 required enterprise tag keys."
+  description = "Tags applied to all resources. Must include the 8 required enterprise tag keys."
   type        = map(string)
   default     = {}
 

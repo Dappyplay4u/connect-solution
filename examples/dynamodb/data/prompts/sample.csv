@@ -1,0 +1,6 @@
+PromptId,PromptName,S3Location,Language,Description
+prompt-001,welcome-en,prompts/welcome_en.wav,en-US,Main welcome greeting
+prompt-002,hold-music,prompts/hold_music.wav,en-US,Hold music loop
+prompt-003,after-hours-en,prompts/after_hours_en.wav,en-US,After hours message
+prompt-004,queue-position-en,prompts/queue_position_en.wav,en-US,Your position in queue is
+prompt-005,goodbye-en,prompts/goodbye_en.wav,en-US,Thank you for calling goodbye

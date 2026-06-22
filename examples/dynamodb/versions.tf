@@ -11,15 +11,20 @@ terraform {
     }
   }
 
-  # backend "s3" {
-  #   bucket         = "<your-tf-state-bucket>"
-  #   key            = "connect/dynamodb/<project_spec>-<environment>-<region>/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   encrypt        = true
-  #   dynamodb_table = "terraform-state-lock"
-  # }
+  # ---------------------------------------------------------------------------
+  # Remote state — required in enterprise.
+  # Fill in the bucket and DynamoDB table provided by your platform team.
+  # ---------------------------------------------------------------------------
+  backend "s3" {
+    bucket         = "<platform-tf-state-bucket>"
+    key            = "connect/dynamodb/ls-uw2/terraform.tfstate"
+    region         = "us-west-2"
+    encrypt        = true
+    dynamodb_table = "<platform-tf-state-lock-table>"
+  }
 }
 
 provider "aws" {
   region = var.aws_region
+  # Credentials come from your SSO session — run `aws sso login` before apply.
 }
