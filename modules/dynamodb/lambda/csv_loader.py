@@ -73,7 +73,7 @@ def handler(event, context):
         if len(parts) < 2:
             logger.error(
                 "Object key '%s' has no folder prefix. Upload CSVs into a "
-                "sub-folder matching the table key (e.g. phone-routing/data.csv). "
+                "sub-folder matching the table key (e.g. agent-configuration/data.csv). "
                 "Known folders: %s",
                 key,
                 list(TABLE_ROUTING.keys()),

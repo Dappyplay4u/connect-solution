@@ -135,6 +135,22 @@ resource "aws_s3_bucket_policy" "csv" {
 }
 
 # ---------------------------------------------------------------------------
+# S3 folder placeholders — one per table key
+# Creates agent-configuration/, DNIS-mapping/, etc. on first apply so the
+# bucket structure is visible before any CSV is uploaded.
+# ---------------------------------------------------------------------------
+
+resource "aws_s3_object" "table_folder" {
+  for_each = var.tables
+
+  bucket       = aws_s3_bucket.csv.id
+  key          = "${each.key}/"
+  content_type = "application/x-directory"
+
+  depends_on = [aws_s3_bucket_policy.csv]
+}
+
+# ---------------------------------------------------------------------------
 # IAM Role — Lambda execution
 # ---------------------------------------------------------------------------
 

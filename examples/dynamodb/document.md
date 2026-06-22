@@ -31,6 +31,7 @@ No manual Lambda invocations needed. Upload the file and the rest is automatic.
 |---|---|
 | DynamoDB table × 6 | `ls-connect-<key>-uw2` |
 | S3 bucket | `ls-connect-uw2-ddb-csv` |
+| S3 folder × 6 | `agent-configuration/`, `DNIS-mapping/`, `ivr-parameters-/`, `ivr-pilot-phone-numbers/`, `office-hours-/`, `prompts/` |
 | Lambda function | `ls-connect-uw2-ddb-loader` |
 | Lambda IAM role | `ls-connect-uw2-ddb-loader-role` |
 | CloudWatch log group | `/aws/lambda/ls-connect-uw2-ddb-loader` |
@@ -54,17 +55,49 @@ No manual Lambda invocations needed. Upload the file and the rest is automatic.
 
 ## Step 1 — Deploy
 
+### 1a. Configure the Terraform backend
+
+Before running `terraform init`, open `versions.tf` and fill in the S3 backend
+details provided by your platform team. `terraform init` will fail if these are
+left as placeholders.
+
+```hcl
+backend "s3" {
+  bucket         = "your-platform-tf-state-bucket"
+  key            = "connect/dynamodb/ls-uw2/terraform.tfstate"
+  region         = "us-west-2"
+  encrypt        = true
+  dynamodb_table = "your-platform-tf-state-lock-table"
+}
+```
+
+### 1b. Authenticate via SSO
+
 ```bash
-cd examples/dynamodb
-
-# Authenticate via SSO (enterprise)
 aws sso login --profile <your-sso-profile>
-export AWS_PROFILE=<your-sso-profile>
+export AWS_PROFILE=<your-sso-profile>     # Mac / Linux
+# $env:AWS_PROFILE = "<your-sso-profile>"  # Windows PowerShell
+```
 
-# Copy and fill in the tfvars
+### 1c. Create your tfvars
+
+```bash
+# Mac / Linux
 cp example.tfvars terraform.tfvars
 
-# Deploy
+# Windows PowerShell
+Copy-Item example.tfvars terraform.tfvars
+```
+
+Open `terraform.tfvars` and set at minimum:
+- `project_name` — short prefix (e.g. `ls`)
+- `aws_region_abbr` — region abbreviation (e.g. `uw2`)
+- All 8 required tag values
+- `iam_permission_boundary_arn` — required if your account enforces a boundary via SCP
+
+### 1d. Deploy
+
+```bash
 terraform init
 terraform plan
 terraform apply
@@ -78,13 +111,23 @@ Outputs:
 csv_bucket_name            = "ls-connect-uw2-ddb-csv"
 csv_loader_function_name   = "ls-connect-uw2-ddb-loader"
 csv_loader_log_group_name  = "/aws/lambda/ls-connect-uw2-ddb-loader"
+
+csv_bucket_folders = {
+  "DNIS-mapping"            = "ls-connect-uw2-ddb-csv/DNIS-mapping/"
+  "agent-configuration"     = "ls-connect-uw2-ddb-csv/agent-configuration/"
+  "ivr-parameters-"         = "ls-connect-uw2-ddb-csv/ivr-parameters-/"
+  "ivr-pilot-phone-numbers" = "ls-connect-uw2-ddb-csv/ivr-pilot-phone-numbers/"
+  "office-hours-"           = "ls-connect-uw2-ddb-csv/office-hours-/"
+  "prompts"                 = "ls-connect-uw2-ddb-csv/prompts/"
+}
+
 table_names = {
-  "DNIS-mapping"             = "ls-connect-DNIS-mapping-uw2"
-  "agent-configuration"      = "ls-connect-agent-configuration-uw2"
-  "ivr-parameters-"          = "ls-connect-ivr-parameters--uw2"
-  "ivr-pilot-phone-numbers"  = "ls-connect-ivr-pilot-phone-numbers-uw2"
-  "office-hours-"            = "ls-connect-office-hours--uw2"
-  "prompts"                  = "ls-connect-prompts-uw2"
+  "DNIS-mapping"            = "ls-connect-DNIS-mapping-uw2"
+  "agent-configuration"     = "ls-connect-agent-configuration-uw2"
+  "ivr-parameters-"         = "ls-connect-ivr-parameters--uw2"
+  "ivr-pilot-phone-numbers" = "ls-connect-ivr-pilot-phone-numbers-uw2"
+  "office-hours-"           = "ls-connect-office-hours--uw2"
+  "prompts"                 = "ls-connect-prompts-uw2"
 }
 ```
 
@@ -121,13 +164,17 @@ aws s3 cp data/prompts/sample.csv \
 
 ### Via AWS Console
 
+After `terraform apply` the bucket already contains the six folders — Terraform
+creates them as part of the deployment.
+
 1. Open **S3** → find bucket `ls-connect-uw2-ddb-csv`
-2. Create a folder matching the table key exactly (e.g. `agent-configuration`)
-3. Upload the CSV file into that folder
+2. Open the folder for the table you want to load (e.g. `agent-configuration/`)
+3. Click **Upload** and select your CSV file
 4. The Lambda fires automatically within a few seconds
 
-> The folder name **must exactly match** the table key in the Terraform `tables`
-> map. A mismatch is logged as an error and no data is written.
+> Do not rename or create new folders manually. The folder name is the routing
+> key the Lambda uses to find the correct table. Only the six pre-created
+> folders are wired up.
 
 ---
 

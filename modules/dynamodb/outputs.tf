@@ -26,6 +26,11 @@ output "csv_bucket_arn" {
   value       = aws_s3_bucket.csv.arn
 }
 
+output "csv_bucket_folders" {
+  description = "Pre-created S3 folder paths. Upload CSVs into these folders to trigger the loader."
+  value       = { for k in keys(var.tables) : k => "${aws_s3_bucket.csv.bucket}/${k}/" }
+}
+
 # ---------------------------------------------------------------------------
 # Lambda loader
 # ---------------------------------------------------------------------------

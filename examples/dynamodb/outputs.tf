@@ -8,6 +8,11 @@ output "csv_bucket_name" {
   value       = module.connect_tables.csv_bucket_name
 }
 
+output "csv_bucket_folders" {
+  description = "Pre-created upload folders — one per table. Drop a CSV into the matching folder to trigger the loader."
+  value       = module.connect_tables.csv_bucket_folders
+}
+
 output "csv_loader_function_name" {
   description = "Lambda function name — check CloudWatch logs here after each upload."
   value       = module.connect_tables.csv_loader_function_name
