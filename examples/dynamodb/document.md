@@ -255,18 +255,70 @@ data/
 
 ## Phase 2 — Automation (after manual testing passes)
 
-Once you have confirmed the pipeline works end-to-end:
+Once you have confirmed the pipeline works end-to-end, GitLab CI/CD can automate
+the S3 upload so any CSV committed to the data repository is loaded automatically
+on merge to `main`.
 
-1. The `.gitlab-ci.yml` in this folder is the ready-to-use pipeline definition.
-2. Add these three CI/CD variables in GitLab (Settings → CI/CD → Variables):
+### What is needed
+
+1. **A GitLab IAM role** — an IAM role the pipeline can assume via OIDC to call
+   `s3:PutObject` on the CSV bucket. This is created separately once testing is
+   complete (not part of this Terraform module).
+
+2. **A `.gitlab-ci.yml`** placed at the **root** of the repository that holds the
+   CSV data files (GitLab only reads it from the repo root, not from
+   subdirectories). A template pipeline looks like this:
+
+   ```yaml
+   stages:
+     - upload
+
+   upload-csv:
+     stage: upload
+     image: amazon/aws-cli:latest
+
+     id_tokens:
+       GITLAB_OIDC_TOKEN:
+         aud: https://gitlab.com
+
+     script:
+       - |
+         CREDS=$(aws sts assume-role-with-web-identity \
+           --role-arn "$AWS_ROLE_ARN" \
+           --role-session-name "gitlab-csv-upload-${CI_PIPELINE_ID}" \
+           --web-identity-token "$GITLAB_OIDC_TOKEN" \
+           --duration-seconds 3600 \
+           --output json)
+         export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['AccessKeyId'])")
+         export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['SecretAccessKey'])")
+         export AWS_SESSION_TOKEN=$(echo "$CREDS" | python3 -c "import sys,json; print(json.load(sys.stdin)['Credentials']['SessionToken'])")
+       - |
+         for table_dir in data/*/; do
+           table_key=$(basename "$table_dir")
+           for csv_file in "${table_dir}"*.csv; do
+             [ -f "$csv_file" ] || continue
+             aws s3 cp "$csv_file" "s3://${CSV_BUCKET_NAME}/${table_key}/$(basename "$csv_file")"
+           done
+         done
+
+     rules:
+       - if: '$CI_COMMIT_BRANCH == "main"'
+         changes:
+           - "data/**/*.csv"
+   ```
+
+3. **Three CI/CD variables** set in GitLab (Settings → CI/CD → Variables):
 
    | Variable | Value |
    |---|---|
-   | `AWS_ROLE_ARN` | ARN of an IAM role with `s3:PutObject` on the CSV bucket |
+   | `AWS_ROLE_ARN` | ARN of the GitLab IAM upload role |
    | `AWS_DEFAULT_REGION` | `us-west-2` |
    | `CSV_BUCKET_NAME` | `ls-connect-uw2-ddb-csv` |
 
-3. Move your real CSV data files into `data/<table-key>/` in the repository.
-4. Merge to `main` — the pipeline uploads changed CSVs automatically.
+### How it works
 
-The IAM role for GitLab can be created separately once testing is complete.
+- The pipeline triggers only when a `.csv` file under `data/` changes on `main`.
+- It exchanges a short-lived GitLab OIDC token for temporary AWS credentials — no
+  long-lived access keys are stored in GitLab.
+- Each CSV is uploaded to `s3://<bucket>/<table-key>/<filename>`, which
+  immediately fires the Lambda and loads the data into DynamoDB.
