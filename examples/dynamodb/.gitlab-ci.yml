@@ -3,7 +3,7 @@
 #
 # Required CI/CD variables (Settings → CI/CD → Variables):
 #   AWS_ROLE_ARN        — from Terraform output: gitlab_upload_role_arn
-#   AWS_DEFAULT_REGION  — e.g. us-east-1
+#   AWS_DEFAULT_REGION  — e.g. us-west-2
 #   CSV_BUCKET_NAME     — from Terraform output: csv_bucket_name
 #
 # How it works:
@@ -14,9 +14,12 @@
 #   4. S3 fires a notification → Lambda routes the file → DynamoDB is updated.
 #
 # Folder → table mapping (must match keys in the Terraform tables variable):
-#   data/phone-routing/*.csv    → phone-routing table
-#   data/blocked-numbers/*.csv  → blocked-numbers table
-#   data/agent-routing/*.csv    → agent-routing table
+#   data/agent-configuration/*.csv      → ls-connect-agent-configuration-uw2
+#   data/DNIS-mapping/*.csv             → ls-connect-DNIS-mapping-uw2
+#   data/ivr-parameters-/*.csv          → ls-connect-ivr-parameters--uw2
+#   data/ivr-pilot-phone-numbers/*.csv  → ls-connect-ivr-pilot-phone-numbers-uw2
+#   data/office-hours-/*.csv            → ls-connect-office-hours--uw2
+#   data/prompts/*.csv                  → ls-connect-prompts-uw2
 # ---------------------------------------------------------------------------
 
 stages:
