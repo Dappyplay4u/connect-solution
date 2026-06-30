@@ -37,6 +37,56 @@ variable "aws_region_abbr" {
   type        = string
 }
 
+# ── Bring-your-own resources (leave "" to auto-create) ───────────────────────
+
+variable "existing_kms_s3_arn" {
+  description = "ARN of an existing KMS key for S3. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_kms_kinesis_arn" {
+  description = "ARN of an existing KMS key for Kinesis. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_kms_connect_arn" {
+  description = "ARN of an existing KMS key for Connect. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_s3_call_recordings_id" {
+  description = "ID of an existing S3 bucket for call recordings. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_s3_scheduled_reports_id" {
+  description = "ID of an existing S3 bucket for scheduled reports. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_s3_chat_transcripts_id" {
+  description = "ID of an existing S3 bucket for chat transcripts. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_kinesis_ctr_arn" {
+  description = "ARN of an existing Kinesis stream for CTR / agent events. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_kinesis_media_arn" {
+  description = "ARN of an existing Kinesis stream for media streams. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
 variable "key_admin_arns" {
   description = "IAM ARNs granted KMS key admin permissions"
   type        = list(string)

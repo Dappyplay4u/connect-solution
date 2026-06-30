@@ -27,6 +27,16 @@ lob             = "tccivr" # line of business
 sdlc_env        = "prod"   # prod | qa | test
 aws_region_abbr = "ue1"    # ue1 | ue2 | uw1 | uw2 | ew1 | ec1
 
+# ── Bring-your-own resources (leave "" to auto-create) ───────────────────────
+existing_kms_s3_arn              = ""
+existing_kms_kinesis_arn         = ""
+existing_kms_connect_arn         = ""
+existing_s3_call_recordings_id   = ""
+existing_s3_scheduled_reports_id = ""
+existing_s3_chat_transcripts_id  = ""
+existing_kinesis_ctr_arn         = ""
+existing_kinesis_media_arn       = ""
+
 # ── KMS key administrators ────────────────────────────────────────────────────
 key_admin_arns = [
   # "arn:aws:iam::<account_id>:role/TerraformDeployRole",

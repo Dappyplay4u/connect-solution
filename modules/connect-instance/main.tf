@@ -29,11 +29,7 @@ module "kms" {
 
   key_admin_arns = var.key_admin_arns
 
-  kms_keys = {
-    s3      = {}
-    kinesis = {}
-    connect = {}
-  }
+  kms_keys = local.kms_keys_to_create
 
   tags = var.tags
 }
