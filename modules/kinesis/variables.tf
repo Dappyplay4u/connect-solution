@@ -120,6 +120,20 @@ variable "alarm_sns_topic_arns" {
   default = []
 }
 
+# ── Bring-your-own streams (leave "" to auto-create) ─────────────────────────
+
+variable "existing_ctr_arn" {
+  description = "ARN of an existing CTR Kinesis stream. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
+variable "existing_media_arn" {
+  description = "ARN of an existing media Kinesis stream. Leave empty to auto-create."
+  type        = string
+  default     = ""
+}
+
 # ── Tags ──────────────────────────────────────────────────────────────────────
 
 variable "tags" {

@@ -34,13 +34,16 @@ locals {
   s3_scheduled_reports_id = var.existing_s3_scheduled_reports_id != "" ? var.existing_s3_scheduled_reports_id : module.s3[0].scheduled_reports_bucket_id
   s3_chat_transcripts_id  = var.existing_s3_chat_transcripts_id != "" ? var.existing_s3_chat_transcripts_id : module.s3[0].chat_transcripts_bucket_id
 
-  # Resolved Kinesis stream ARN
-  kinesis_ctr_arn = var.existing_kinesis_ctr_arn != "" ? var.existing_kinesis_ctr_arn : module.kinesis[0].ctr_stream_arn
+  # Resolved Kinesis stream ARNs — each stream is independently controlled
+  kinesis_ctr_arn   = var.existing_kinesis_ctr_arn != "" ? var.existing_kinesis_ctr_arn : module.kinesis[0].ctr_stream_arn
+  kinesis_media_arn = var.existing_kinesis_media_arn != "" ? var.existing_kinesis_media_arn : module.kinesis[0].media_stream_arn
 
   # Whether to create child modules
+  # KMS: all three keys must be provided together or all left empty
   create_kms     = var.existing_kms_s3_arn == "" ? 1 : 0
   create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
-  create_kinesis = var.existing_kinesis_ctr_arn == "" ? 1 : 0
+  # Kinesis: create the module if either stream needs to be created
+  create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
 
   common_tags = merge(var.tags, {
     sdlc_env       = local.sdlc_env

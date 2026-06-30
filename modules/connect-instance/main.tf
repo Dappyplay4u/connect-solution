@@ -85,6 +85,10 @@ module "kinesis" {
   kms_key_id  = local.kms_kinesis_id
   kms_key_arn = local.kms_kinesis_arn
 
+  # Bring-your-own streams — the kinesis module skips creation for any non-empty ARN
+  existing_ctr_arn   = var.existing_kinesis_ctr_arn
+  existing_media_arn = var.existing_kinesis_media_arn
+
   stream_mode            = var.kinesis_stream_mode
   retention_period_hours = var.kinesis_retention_hours
 

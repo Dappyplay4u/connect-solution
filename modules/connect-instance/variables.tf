@@ -104,7 +104,13 @@ variable "existing_s3_chat_transcripts_id" {
 }
 
 variable "existing_kinesis_ctr_arn" {
-  description = "Existing Kinesis stream ARN for CTR (leave empty to auto-create)"
+  description = "Existing Kinesis stream ARN for CTR / agent events (leave empty to auto-create)"
+  type        = string
+  default     = ""
+}
+
+variable "existing_kinesis_media_arn" {
+  description = "Existing Kinesis stream ARN for media streams (leave empty to auto-create)"
   type        = string
   default     = ""
 }

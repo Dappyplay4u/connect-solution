@@ -9,7 +9,7 @@
 ###############################################################################
 
 resource "aws_kinesis_stream" "this" {
-  for_each = local.stream_definitions
+  for_each = local.streams_to_create
 
   name             = "${local.prefix}-${each.value.account}-connect-${local.lob}-${each.value.stream_name}-datastream-${local.aws_region_abbr}"
   retention_period = var.retention_period_hours
@@ -96,7 +96,7 @@ resource "aws_iam_role_policy" "firehose" {
           "kinesis:ListShards",
           "kinesis:SubscribeToShard",
         ]
-        Resource = [aws_kinesis_stream.this["contact_trace_records"].arn]
+        Resource = [local.resolved_ctr_arn]
       },
       {
         Sid      = "CloudWatchLogs"
@@ -117,7 +117,7 @@ resource "aws_kinesis_firehose_delivery_stream" "ctr" {
   destination = "extended_s3"
 
   kinesis_source_configuration {
-    kinesis_stream_arn = aws_kinesis_stream.this["contact_trace_records"].arn
+    kinesis_stream_arn = local.resolved_ctr_arn
     role_arn           = aws_iam_role.firehose[0].arn
   }
 
@@ -149,7 +149,7 @@ resource "aws_kinesis_firehose_delivery_stream" "ctr" {
 # ── CloudWatch Alarms: iterator age ──────────────────────────────────────────
 
 resource "aws_cloudwatch_metric_alarm" "iterator_age" {
-  for_each = var.enable_cloudwatch_alarms ? local.stream_definitions : {}
+  for_each = var.enable_cloudwatch_alarms ? local.streams_to_create : {}
 
   alarm_name          = "${local.prefix}-${each.value.account}-connect-${local.lob}-${each.value.stream_name}-iterator-age-high"
   comparison_operator = "GreaterThanThreshold"
