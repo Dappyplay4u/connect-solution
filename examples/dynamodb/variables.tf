@@ -15,6 +15,18 @@ variable "aws_region_abbr" {
   default     = "uw2"
 }
 
+variable "existing_table_arns" {
+  description = "Map of table key → ARN for tables that already exist. Leave empty to auto-create all tables."
+  type        = map(string)
+  default     = {}
+}
+
+variable "existing_iam_role_arn" {
+  description = "ARN of an existing IAM role for the Lambda CSV loader. Leave null to auto-create."
+  type        = string
+  default     = null
+}
+
 variable "kms_master_key_id" {
   description = "Optional KMS key ARN. When null, AWS-managed encryption is used."
   type        = string

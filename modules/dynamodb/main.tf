@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 
 resource "aws_dynamodb_table" "this" {
-  for_each = var.tables
+  for_each = local.tables_to_create
 
   name           = "${local.prefix}-connect-${each.key}-${local.aws_region_abbr}"
   billing_mode   = each.value.billing_mode
@@ -155,6 +155,8 @@ resource "aws_s3_object" "table_folder" {
 # ---------------------------------------------------------------------------
 
 resource "aws_iam_role" "csv_loader" {
+  count = local.create_iam
+
   name                 = local.iam_role_name
   permissions_boundary = var.iam_permission_boundary_arn
 
@@ -171,8 +173,10 @@ resource "aws_iam_role" "csv_loader" {
 }
 
 resource "aws_iam_role_policy" "csv_loader" {
+  count = local.create_iam
+
   name = local.iam_policy_name
-  role = aws_iam_role.csv_loader.id
+  role = aws_iam_role.csv_loader[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -193,7 +197,7 @@ resource "aws_iam_role_policy" "csv_loader" {
           "dynamodb:DeleteItem",
           "dynamodb:Scan",
         ]
-        Resource = [for k, v in aws_dynamodb_table.this : v.arn]
+        Resource = values(local.all_table_arns)
       },
       {
         Sid    = "WriteLogs"
@@ -209,10 +213,10 @@ resource "aws_iam_role_policy" "csv_loader" {
 }
 
 resource "aws_iam_role_policy" "csv_loader_kms" {
-  count = local.use_kms ? 1 : 0
+  count = local.use_kms && local.create_iam == 1 ? 1 : 0
 
   name = "${local.iam_policy_name}-kms"
-  role = aws_iam_role.csv_loader.id
+  role = aws_iam_role.csv_loader[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -247,7 +251,7 @@ resource "aws_lambda_function" "csv_loader" {
   source_code_hash = data.archive_file.csv_loader.output_base64sha256
   handler          = "csv_loader.handler"
   runtime          = "python3.12"
-  role             = aws_iam_role.csv_loader.arn
+  role             = local.lambda_role_arn
   timeout          = var.lambda_timeout_seconds
   memory_size      = var.lambda_memory_mb
 

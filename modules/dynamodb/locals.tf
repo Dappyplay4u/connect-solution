@@ -20,10 +20,27 @@ locals {
 
   use_kms = var.kms_master_key_id != null
 
+  # IAM — skip role + policy creation when an existing role ARN is supplied
+  create_iam     = var.existing_iam_role_arn == null ? 1 : 0
+  lambda_role_arn = coalesce(var.existing_iam_role_arn, try(aws_iam_role.csv_loader[0].arn, null))
+
+  # Tables to create — excludes any key already present in existing_table_arns
+  tables_to_create = {
+    for k, v in var.tables : k => v
+    if !contains(keys(var.existing_table_arns), k)
+  }
+
+  # Full ARN map covering both created and pre-existing tables.
+  # Used by the Lambda IAM policy so it has access to all tables.
+  all_table_arns = merge(
+    { for k, v in aws_dynamodb_table.this : k => v.arn },
+    var.existing_table_arns
+  )
+
   # Per-table key attribute maps (hash + range + GSI keys, deduplicated).
   # DynamoDB only allows attribute blocks for key attributes.
   table_attributes = {
-    for k, v in var.tables : k => merge(
+    for k, v in local.tables_to_create : k => merge(
       { (v.hash_key) = v.hash_key_type },
       v.range_key != null ? { (v.range_key) = coalesce(v.range_key_type, "S") } : {},
       merge([

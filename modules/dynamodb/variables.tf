@@ -133,6 +133,30 @@ variable "lambda_log_retention_days" {
 # Enterprise / IAM governance
 # ---------------------------------------------------------------------------
 
+variable "existing_table_arns" {
+  description = <<-EOT
+    Map of table key → ARN for DynamoDB tables that already exist.
+    Any key present here is skipped during creation; the ARN is used directly
+    in the Lambda IAM policy so it can still read and write that table.
+    Keys must match entries in the tables variable.
+    Leave empty to auto-create all tables.
+  EOT
+  type    = map(string)
+  default = {}
+}
+
+variable "existing_iam_role_arn" {
+  description = <<-EOT
+    ARN of an existing IAM role to use for the Lambda CSV loader.
+    Leave null to auto-create. When provided, the module skips creating the
+    IAM role and its inline policies — the existing role must already have
+    permissions to read from the CSV S3 bucket, write to the DynamoDB tables,
+    and write CloudWatch logs.
+  EOT
+  type    = string
+  default = null
+}
+
 variable "iam_permission_boundary_arn" {
   description = "ARN of an IAM permissions boundary to attach to the Lambda execution role. Required in SSO-managed enterprise accounts."
   type        = string

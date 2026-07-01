@@ -1,7 +1,3 @@
-###############################################################################
-# KMS Module — Outputs
-###############################################################################
-
 output "key_arns" {
   description = "Map of key purpose → KMS Key ARN  (e.g. { s3 = \"arn:aws:kms:...\" })"
   value       = { for k, v in aws_kms_key.this : k => v.arn }

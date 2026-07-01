@@ -26,14 +26,14 @@ locals {
   # as existing are passed to the child module, so it never creates a key
   # you already supplied.
   kms_keys_to_create = merge(
-    var.existing_kms_s3_arn == "" ? { s3 = {} } : {},
+    var.existing_kms_s3_arn      == "" ? { s3      = {} } : {},
     var.existing_kms_kinesis_arn == "" ? { kinesis = {} } : {},
     var.existing_kms_connect_arn == "" ? { connect = {} } : {},
   )
 
   # Resolved KMS ARNs — use existing if provided, else fall through to child
-  # module. try() is required here: a plain ternary still evaluates the
-  # module[0] index even on the discarded branch, which errors when count = 0.
+  # module. try() is required: a plain ternary still evaluates the module[0]
+  # index even on the discarded branch, which errors when count = 0.
   kms_s3_arn      = var.existing_kms_s3_arn != "" ? var.existing_kms_s3_arn : try(module.kms[0].s3_key_arn, null)
   kms_s3_id       = var.existing_kms_s3_arn != "" ? var.existing_kms_s3_arn : try(module.kms[0].s3_key_id, null)
   kms_kinesis_arn = var.existing_kms_kinesis_arn != "" ? var.existing_kms_kinesis_arn : try(module.kms[0].kinesis_key_arn, null)
@@ -50,10 +50,9 @@ locals {
   kinesis_media_arn = var.existing_kinesis_media_arn != "" ? var.existing_kinesis_media_arn : try(module.kinesis[0].media_stream_arn, null)
 
   # Whether to create child modules
-  create_kms      = length(local.kms_keys_to_create) > 0 ? 1 : 0
-  create_s3       = var.existing_s3_call_recordings_id == "" ? 1 : 0
-  # Kinesis: create the module if either stream needs to be created
-  create_kinesis  = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
+  create_kms     = length(local.kms_keys_to_create) > 0 ? 1 : 0
+  create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
+  create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
 
   common_tags = merge(var.tags, {
     sdlc_env       = local.sdlc_env
