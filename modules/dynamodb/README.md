@@ -275,13 +275,95 @@ phone_number,contact_flow_id,queue_id,description
 
 ---
 
-## How to Add a New Table
+## Adding Tables and Changing Table Structure
 
-1. Add a new key to `var.tables` in your root module.
-2. Run `terraform apply` — Terraform creates the DynamoDB table and updates `TABLE_ROUTING` on the Lambda.
-3. Upload a CSV to `s3://<bucket>/<new-key>/file.csv`.
+### Adding a New Table (Terraform creates it)
 
-No Lambda code changes, no new S3 buckets, no new IAM roles.
+Only one file changes: add an entry to the `tables` map in your root module (`examples/dynamodb/main.tf`).
+
+```hcl
+tables = {
+  # existing tables ...
+
+  "new-table-key" = {
+    hash_key = "YourPrimaryKey"
+  }
+}
+```
+
+Run `terraform apply`. Everything else is automatic:
+
+| What updates automatically | How |
+|---|---|
+| New DynamoDB table created | `for_each = local.tables_to_create` |
+| New S3 folder `new-table-key/` created in the CSV bucket | `for_each = var.tables` in `aws_s3_object.table_folder` |
+| Lambda `TABLE_ROUTING` env var updated to include new table | `for k, v in var.tables` in `table_routing` local |
+| Lambda IAM policy updated to allow writes to new table | `values(local.all_table_arns)` picks it up |
+
+No Lambda code changes. No new S3 buckets. No new IAM roles.
+
+Then upload data:
+```bash
+aws s3 cp your-file.csv s3://<csv_bucket_name>/new-table-key/your-file.csv
+```
+
+---
+
+### Adding a New Table (table already exists in AWS)
+
+If the table was created outside of Terraform (or by a previous deployment), pass it via `existing_table_arns` in your tfvars. Terraform skips creation but the Lambda still routes to it and has IAM access.
+
+In `example.tfvars`:
+```hcl
+existing_table_arns = {
+  "new-table-key" = "arn:aws:dynamodb:us-west-2:<account_id>:table/ls-connect-new-table-key-uw2"
+}
+```
+
+Still add the table entry to the `tables` map in `main.tf` — the map drives the Lambda routing and S3 folder structure regardless of who created the table.
+
+---
+
+### Changing Table Structure
+
+DynamoDB has strict rules about what can be changed on a live table. The table must be in mind when making changes.
+
+#### Safe changes (apply with no disruption)
+
+| Change | What to do |
+|---|---|
+| Add a new GSI | Add to `global_secondary_indexes` list and run `terraform apply` |
+| Change `billing_mode` from `PAY_PER_REQUEST` to `PROVISIONED` | Update `billing_mode`, set `read_capacity` and `write_capacity`, apply |
+| Enable/disable TTL | Set/remove `ttl_attribute_name`, apply |
+| Enable/disable PITR | Toggle `point_in_time_recovery_enabled`, apply |
+| Change `csv_number_attributes` | Update the list, apply — only affects how the Lambda interprets future CSV uploads, not existing table data |
+| Change `sync_mode` | Update the flag, apply — only affects future CSV uploads |
+
+#### Destructive changes (require table replacement)
+
+DynamoDB does **not** allow changing the primary key (`hash_key`, `range_key`) or key types on a live table. Terraform will destroy and recreate the table, **deleting all existing data**.
+
+| Change | Impact |
+|---|---|
+| Rename `hash_key` | Table destroyed and recreated — all data lost |
+| Change `hash_key_type` | Table destroyed and recreated — all data lost |
+| Add or remove `range_key` | Table destroyed and recreated — all data lost |
+| Rename the map key in `tables` | Treated as delete old + create new — all data lost |
+
+Before making any destructive change:
+
+1. Export the existing table data:
+   ```bash
+   aws dynamodb scan --table-name <table-name> --output json > backup.json
+   ```
+2. Apply the Terraform change (table is recreated empty).
+3. Re-upload via CSV or restore from the backup.
+
+#### Removing a table
+
+Remove the key from the `tables` map in `main.tf` and run `terraform apply`. The DynamoDB table, its S3 folder placeholder, and its Lambda routing entry are all removed. Existing data in the table is permanently deleted.
+
+If you want to stop managing the table with Terraform without deleting it, move the ARN to `existing_table_arns` and remove it from `tables` before applying.
 
 ---
 
