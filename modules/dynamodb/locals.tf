@@ -59,7 +59,7 @@ locals {
     for k, v in var.tables : k => {
       table_name        = "${local.prefix}-connect-${k}-${local.aws_region_abbr}"
       hash_key          = v.hash_key
-      range_key         = coalesce(v.range_key, "")
+      range_key         = v.range_key != null ? v.range_key : ""
       number_attributes = v.csv_number_attributes
       sync_mode         = v.sync_mode
     }
