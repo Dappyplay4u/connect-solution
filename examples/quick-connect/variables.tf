@@ -46,6 +46,31 @@ variable "instance_alias" {
 }
 
 # ---------------------------------------------------------------------------
+# Queue quick connects
+# ---------------------------------------------------------------------------
+
+variable "transfer_to_queue_flow_id" {
+  description = <<-EOT
+    ID of the "Transfer to queue" contact flow in the Connect instance.
+    All QUEUE-type quick connects share this flow.
+    Find it in Connect console → Contact flows → filter by type "Transfer to queue".
+    When null, no QUEUE-type quick connects are created.
+  EOT
+  type    = string
+  default = null
+}
+
+variable "queues_to_skip" {
+  description = <<-EOT
+    List of queue keys to exclude from the data source lookup and quick connect creation.
+    Use this for queues that exist in locals.tf but have not yet been created in Connect.
+    Keys must match entries in the queue lists in locals.tf.
+  EOT
+  type    = list(string)
+  default = []
+}
+
+# ---------------------------------------------------------------------------
 # Required enterprise tags
 # ---------------------------------------------------------------------------
 

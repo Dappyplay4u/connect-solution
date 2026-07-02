@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------
 # Step 1 — Hours of Operation
 #
-# Deploy this module first. Its output IDs are passed directly to the queues
-# module below. Both modules reference the same Connect instance.
+# Two schedules are defined here and referenced by name in the queues below.
+# Deploy this module first; its output IDs are passed directly to the queues.
 # ---------------------------------------------------------------------------
 
 module "hours" {
@@ -52,9 +52,12 @@ module "hours" {
 # ---------------------------------------------------------------------------
 # Step 2 — Queues
 #
-# hours_of_operation_id for each queue is supplied from module.hours above.
-# To reference a pre-existing hours of operation (e.g. the Connect default
-# "Basic Hours") pass its ID string directly instead.
+# Queues are grouped by business category. Each group shares the same
+# hours-of-operation and max_contacts setting. Descriptions are auto-generated
+# from the queue key via local.queue_descriptions.
+#
+# To add a new queue: add its key to the appropriate list in locals.tf.
+# No changes to this file are needed.
 # ---------------------------------------------------------------------------
 
 module "queues" {
@@ -69,37 +72,117 @@ module "queues" {
   instance_id    = var.instance_id
   instance_alias = var.instance_alias
 
-  queues = {
+  queues = merge(
 
-    billing = {
-      description           = "Billing enquiries queue"
-      hours_of_operation_id = module.hours.hours_of_operation_ids["standard-business-hours"]
-      max_contacts          = 50
-      status                = "ENABLED"
-    }
+    # -------------------------------------------------------------------------
+    # Customer Care → Standard Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.customer_care_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["standard-business-hours"]
+        max_contacts          = 100
+        status                = "ENABLED"
+      }
+    },
 
-    sales = {
-      description           = "Sales enquiries queue"
-      hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
-      max_contacts          = 100
-      status                = "ENABLED"
-    }
+    # -------------------------------------------------------------------------
+    # Credit Card Services → Extended Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.credit_card_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 150
+        status                = "ENABLED"
+      }
+    },
 
-    support = {
-      description           = "Technical support queue"
-      hours_of_operation_id = module.hours.hours_of_operation_ids["standard-business-hours"]
-      max_contacts          = 75
-      status                = "ENABLED"
-    }
+    # -------------------------------------------------------------------------
+    # Loans → Standard Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.loans_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["standard-business-hours"]
+        max_contacts          = 75
+        status                = "ENABLED"
+      }
+    },
 
-    after-hours = {
-      description           = "After hours overflow queue"
-      hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
-      max_contacts          = 0
-      status                = "ENABLED"
-    }
+    # -------------------------------------------------------------------------
+    # Digital / Online Support → Extended Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.digital_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 120
+        status                = "ENABLED"
+      }
+    },
 
-  }
+    # -------------------------------------------------------------------------
+    # Premier Customer Services → Standard Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.premier_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["standard-business-hours"]
+        max_contacts          = 50
+        status                = "ENABLED"
+      }
+    },
+
+    # -------------------------------------------------------------------------
+    # Spanish Language Support → Extended Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.spanish_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 100
+        status                = "ENABLED"
+      }
+    },
+
+    # -------------------------------------------------------------------------
+    # Fraud & Security → Extended Hours (24/7 schedule when available)
+    # -------------------------------------------------------------------------
+    {
+      for q in local.fraud_security_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 200
+        status                = "ENABLED"
+      }
+    },
+
+    # -------------------------------------------------------------------------
+    # Business & Commercial Services → Extended Hours
+    # -------------------------------------------------------------------------
+    {
+      for q in local.business_commercial_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 100
+        status                = "ENABLED"
+      }
+    },
+
+    # -------------------------------------------------------------------------
+    # Special Routing / IVR → Extended Hours (unlimited capacity)
+    # -------------------------------------------------------------------------
+    {
+      for q in local.special_routing_queues : q => {
+        description           = local.queue_descriptions[q]
+        hours_of_operation_id = module.hours.hours_of_operation_ids["extended-hours"]
+        max_contacts          = 0
+        status                = "ENABLED"
+      }
+    },
+
+  )
 
   tags = local.required_tags
 }

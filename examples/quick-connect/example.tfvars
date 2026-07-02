@@ -18,6 +18,27 @@ aws_region_abbr = "ue1"
 instance_alias = "retail-prod-ue1"
 
 # ---------------------------------------------------------------------------
+# Transfer to queue contact flow
+#
+# All QUEUE-type quick connects share this flow.
+# Find it in: Connect console → Contact flows → filter type "Transfer to queue"
+# Then copy the ID from the URL or flow detail page.
+# ---------------------------------------------------------------------------
+# transfer_to_queue_flow_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# ---------------------------------------------------------------------------
+# Queues to skip
+#
+# List any queue keys from locals.tf that do not yet exist in Connect.
+# Those queues are excluded from the data source lookup and no quick connect
+# is created for them. Remove a key from this list once the queue is created.
+# ---------------------------------------------------------------------------
+# queues_to_skip = [
+#   "CC_CD2_CardAcctInfoFD",
+#   "CC_CD3_CardPinChangeFD",
+# ]
+
+# ---------------------------------------------------------------------------
 # Required enterprise tags
 # ---------------------------------------------------------------------------
 business_application_id   = "APP-001"

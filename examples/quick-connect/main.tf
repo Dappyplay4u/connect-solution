@@ -13,63 +13,52 @@ module "quick_connect" {
   # ---------------------------------------------------------------------------
   # Connect instance
   #
-  # Option A — pass the instance ID directly (from connect-instance module
-  #            output or an existing instance):
+  # Option A — pass the instance ID directly:
   #   instance_id = var.instance_id
   #
   # Option B — let the module resolve the ID by alias:
   #   instance_alias = var.instance_alias
   #
-  # Only one is required. instance_id takes precedence if both are set.
+  # Swap instances by changing instance_id or instance_alias in example.tfvars.
   # ---------------------------------------------------------------------------
   instance_id    = var.instance_id
   instance_alias = var.instance_alias
 
   # ---------------------------------------------------------------------------
-  # Quick Connects
+  # Quick connects
   #
-  # Each key becomes part of the resource name:
-  #   <project_name>-<account>-connect-<lob>-<sdlc_env>-<aws_region_abbr>-<key>
+  # QUEUE-type quick connects are built automatically from data.aws_connect_queue.
+  # Queues are looked up by their full name from the Connect instance — no manual
+  # ID copying required.
   #
-  # Three types are supported:
-  #
-  #   PHONE_NUMBER — transfers an agent to an external phone number.
-  #                  Required: phone_number (E.164 format).
-  #
-  #   QUEUE        — transfers an agent to an internal Connect queue.
-  #                  Required: contact_flow_id, queue_id.
-  #                  Use the connect-queue module output for queue_id.
-  #
-  #   AGENT        — transfers an agent directly to another agent.
-  #                  Required: contact_flow_id, user_id.
-  #                  user_id is the Connect UserId (not the IAM user).
+  # To exclude queues not yet created: add their keys to queues_to_skip in tfvars.
+  # To add PHONE_NUMBER or AGENT types: merge them in below.
   # ---------------------------------------------------------------------------
-  quick_connects = {
+  quick_connects = merge(
 
-    # Transfer to an external support line
-    external-support = {
-      description  = "Transfer to external tier-2 support line"
-      type         = "PHONE_NUMBER"
-      phone_number = "+15551234567"
-    }
+    # QUEUE-type — auto-populated from existing Connect queues via data source
+    local.queue_quick_connects,
 
-    # Transfer to an internal sales queue
-    sales-queue = {
-      description     = "Transfer to the internal sales queue"
-      type            = "QUEUE"
-      contact_flow_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
-      queue_id        = "ffffffff-gggg-hhhh-iiii-jjjjjjjjjjjj"
-    }
+    # PHONE_NUMBER-type — uncomment and populate as needed
+    # {
+    #   external-fraud-line = {
+    #     description  = "Transfer to external fraud support line"
+    #     type         = "PHONE_NUMBER"
+    #     phone_number = "+15551234567"
+    #   }
+    # },
 
-    # Transfer directly to a senior agent
-    senior-agent = {
-      description     = "Transfer to senior agent for escalations"
-      type            = "AGENT"
-      contact_flow_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
-      user_id         = "kkkkkkkk-llll-mmmm-nnnn-oooooooooooo"
-    }
+    # AGENT-type — uncomment and populate as needed
+    # {
+    #   senior-agent = {
+    #     description     = "Transfer to senior agent for escalations"
+    #     type            = "AGENT"
+    #     contact_flow_id = "<transfer-to-agent-flow-id>"
+    #     user_id         = "<connect-user-id>"
+    #   }
+    # },
 
-  }
+  )
 
   tags = local.required_tags
 }
