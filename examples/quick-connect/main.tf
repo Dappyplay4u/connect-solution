@@ -35,29 +35,9 @@ module "quick_connect" {
   # To add PHONE_NUMBER or AGENT types: merge them in below.
   # ---------------------------------------------------------------------------
   quick_connects = merge(
-
-    # QUEUE-type — auto-populated from existing Connect queues via data source
-    local.queue_quick_connects,
-
-    # PHONE_NUMBER-type — uncomment and populate as needed
-    # {
-    #   external-fraud-line = {
-    #     description  = "Transfer to external fraud support line"
-    #     type         = "PHONE_NUMBER"
-    #     phone_number = "+15551234567"
-    #   }
-    # },
-
-    # AGENT-type — uncomment and populate as needed
-    # {
-    #   senior-agent = {
-    #     description     = "Transfer to senior agent for escalations"
-    #     type            = "AGENT"
-    #     contact_flow_id = "<transfer-to-agent-flow-id>"
-    #     user_id         = "<connect-user-id>"
-    #   }
-    # },
-
+    local.queue_quick_connects,   # QUEUE       — from data.aws_connect_queue
+    local.phone_quick_connects,   # PHONE_NUMBER — from local.phone_number_entries
+    local.user_quick_connects,    # USER         — from local.user_entries
   )
 
   tags = local.required_tags

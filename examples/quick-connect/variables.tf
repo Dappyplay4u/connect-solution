@@ -60,6 +60,17 @@ variable "transfer_to_queue_flow_id" {
   default = null
 }
 
+variable "transfer_to_agent_flow_id" {
+  description = <<-EOT
+    ID of the "Transfer to agent" contact flow in the Connect instance.
+    All USER-type quick connects share this flow.
+    Find it in Connect console → Contact flows → filter by type "Transfer to agent".
+    When null, no USER-type quick connects are created.
+  EOT
+  type    = string
+  default = null
+}
+
 variable "queues_to_skip" {
   description = <<-EOT
     List of queue keys to exclude from the data source lookup and quick connect creation.

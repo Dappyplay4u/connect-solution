@@ -69,7 +69,7 @@ variable "quick_connects" {
     Map of quick connect definitions. Each key becomes part of the resource name:
     <name_prefix>-<key>.
 
-    type            PHONE_NUMBER, QUEUE, or AGENT.
+    type            PHONE_NUMBER, QUEUE, or USER.
 
     PHONE_NUMBER    routes an agent transfer to an external phone number.
                     Required field: phone_number (E.164 format, e.g. +15551234567).
@@ -77,7 +77,7 @@ variable "quick_connects" {
     QUEUE           routes an agent transfer to an internal queue.
                     Required fields: contact_flow_id, queue_id.
 
-    AGENT           routes an agent transfer directly to another agent.
+    USER            routes an agent transfer directly to another Connect user (agent).
                     Required fields: contact_flow_id, user_id.
   EOT
   type = map(object({
@@ -92,9 +92,9 @@ variable "quick_connects" {
   validation {
     condition = alltrue([
       for k, v in var.quick_connects :
-      contains(["PHONE_NUMBER", "QUEUE", "AGENT"], v.type)
+      contains(["PHONE_NUMBER", "QUEUE", "USER"], v.type)
     ])
-    error_message = "Each quick connect type must be PHONE_NUMBER, QUEUE, or AGENT."
+    error_message = "Each quick connect type must be PHONE_NUMBER, QUEUE, or USER."
   }
 
   validation {
@@ -102,9 +102,9 @@ variable "quick_connects" {
       for k, v in var.quick_connects :
       (v.type == "PHONE_NUMBER" && v.phone_number != null) ||
       (v.type == "QUEUE" && v.contact_flow_id != null && v.queue_id != null) ||
-      (v.type == "AGENT" && v.contact_flow_id != null && v.user_id != null)
+      (v.type == "USER" && v.contact_flow_id != null && v.user_id != null)
     ])
-    error_message = "PHONE_NUMBER requires phone_number; QUEUE requires contact_flow_id and queue_id; AGENT requires contact_flow_id and user_id."
+    error_message = "PHONE_NUMBER requires phone_number; QUEUE requires contact_flow_id and queue_id; USER requires contact_flow_id and user_id."
   }
 }
 

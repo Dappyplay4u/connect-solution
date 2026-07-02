@@ -27,6 +27,14 @@ instance_alias = "retail-prod-ue1"
 # transfer_to_queue_flow_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 # ---------------------------------------------------------------------------
+# Transfer to agent contact flow
+#
+# All USER-type quick connects share this flow.
+# Find it in: Connect console → Contact flows → filter type "Transfer to agent"
+# ---------------------------------------------------------------------------
+# transfer_to_agent_flow_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# ---------------------------------------------------------------------------
 # Queues to skip
 #
 # List any queue keys from locals.tf that do not yet exist in Connect.

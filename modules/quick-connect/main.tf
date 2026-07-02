@@ -23,8 +23,8 @@ resource "aws_connect_quick_connect" "this" {
       }
     }
 
-    dynamic "agent_config" {
-      for_each = each.value.type == "AGENT" ? [1] : []
+    dynamic "user_config" {
+      for_each = each.value.type == "USER" ? [1] : []
       content {
         contact_flow_id = each.value.contact_flow_id
         user_id         = each.value.user_id

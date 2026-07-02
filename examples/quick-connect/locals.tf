@@ -149,6 +149,69 @@ locals {
   ]
 
   # ---------------------------------------------------------------------------
+  # Phone number entries — add / remove external transfer numbers here.
+  # Key becomes part of the Connect resource name.
+  # ---------------------------------------------------------------------------
+  phone_number_entries = {
+    # "external-fraud-line" = {
+    #   description  = "Transfer to external fraud support line"
+    #   phone_number = "+15551234567"
+    # }
+    # "external-escalation" = {
+    #   description  = "Transfer to tier-3 escalation line"
+    #   phone_number = "+15559876543"
+    # }
+    # "external-spanish-support" = {
+    #   description  = "Transfer to Spanish language support line"
+    #   phone_number = "+15552223333"
+    # }
+  }
+
+  # ---------------------------------------------------------------------------
+  # User (agent) entries — add / remove agent transfer shortcuts here.
+  # All entries share transfer_to_agent_flow_id from variables.tf.
+  # user_id is the Connect User ID — not the IAM or SSO user ID.
+  # ---------------------------------------------------------------------------
+  user_entries = {
+    # "senior-agent-john" = {
+    #   description = "John - Senior Agent"
+    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # }
+    # "senior-agent-sarah" = {
+    #   description = "Sarah - Team Lead"
+    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # }
+    # "supervisor-mike" = {
+    #   description = "Mike - Supervisor"
+    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # }
+  }
+
+  # ---------------------------------------------------------------------------
+  # PHONE_NUMBER-type quick connects — built from phone_number_entries above.
+  # ---------------------------------------------------------------------------
+  phone_quick_connects = {
+    for k, v in local.phone_number_entries : k => {
+      type         = "PHONE_NUMBER"
+      description  = v.description
+      phone_number = v.phone_number
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # USER-type quick connects — built from user_entries above.
+  # Skipped entirely when transfer_to_agent_flow_id is not provided.
+  # ---------------------------------------------------------------------------
+  user_quick_connects = var.transfer_to_agent_flow_id != null ? {
+    for k, v in local.user_entries : k => {
+      type            = "USER"
+      description     = v.description
+      contact_flow_id = var.transfer_to_agent_flow_id
+      user_id         = v.user_id
+    }
+  } : {}
+
+  # ---------------------------------------------------------------------------
   # QUEUE-type quick connects — built from data source results.
   # One quick connect per looked-up queue. Skipped if transfer_to_queue_flow_id
   # is not provided.
