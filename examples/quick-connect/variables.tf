@@ -81,15 +81,12 @@ variable "queues_to_skip" {
   default = []
 }
 
-# ---------------------------------------------------------------------------
-# Required enterprise tags
-# ---------------------------------------------------------------------------
-
-variable "business_application_id"   { type = string }
-variable "cost_center"               { type = string }
-variable "created_by"                { type = string }
-variable "technical_support_by"      { type = string }
-variable "application_group"         { type = string }
-variable "technical_environment"     { type = string }
-variable "security_data_application" { type = string }
-variable "business_application_code" { type = string }
+variable "users_to_skip" {
+  description = <<-EOT
+    List of Connect usernames to exclude from the data source lookup and quick connect creation.
+    Use this for users that exist in locals.tf but have not yet been created in Connect.
+    Values must match entries in the user_names list in locals.tf.
+  EOT
+  type    = list(string)
+  default = []
+}

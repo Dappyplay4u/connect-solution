@@ -53,6 +53,4 @@ module "connect" {
   # ── CloudWatch alarm notifications ───────────────────────────────────────────
   alarm_sns_topic_arns = var.alarm_sns_topic_arns
 
-  # ── Required tags ────────────────────────────────────────────────────────────
-  tags = local.required_tags
 }

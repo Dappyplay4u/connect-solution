@@ -18,3 +18,12 @@ data "aws_connect_queue" "this" {
   instance_id = local.resolved_instance_id
   name        = "${local.queue_name_prefix}-${each.key}"
 }
+
+# Look up every Connect user by username (typically an email or AD login).
+# Any username listed in var.users_to_skip is excluded from the lookup —
+# use this for users that don't yet exist in Connect.
+data "aws_connect_user" "this" {
+  for_each    = toset(local.users_to_lookup)
+  instance_id = local.resolved_instance_id
+  name        = each.key
+}

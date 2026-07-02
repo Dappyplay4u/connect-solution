@@ -29,6 +29,4 @@ module "kms" {
     kinesis = {}
     connect = {}
   }
-
-  tags = local.required_tags
 }

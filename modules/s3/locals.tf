@@ -34,8 +34,4 @@ locals {
       prefix      = "chat-transcripts/"
     }
   }
-
-  common_tags = merge(var.tags, {
-    sdlc_env = local.sdlc_env
-  })
 }

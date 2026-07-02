@@ -29,9 +29,4 @@ locals {
       service_principals = length(v.service_principals) > 0 ? v.service_principals : lookup(local.default_service_principals, k, [])
     })
   }
-
-  common_tags = merge(var.tags, {
-    Name     = local.name_prefix
-    sdlc_env = local.sdlc_env
-  })
 }

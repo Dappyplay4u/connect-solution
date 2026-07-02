@@ -15,10 +15,6 @@ resource "aws_s3_bucket" "this" {
 
   bucket        = "${local.prefix}-${local.account}-connect-${local.lob}-${local.sdlc_env}-${each.value.suffix}-${local.aws_region_abbr}"
   force_destroy = var.force_destroy
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${local.account}-connect-${local.lob}-${local.sdlc_env}-${each.value.suffix}-${local.aws_region_abbr}"
-  })
 }
 
 resource "aws_s3_bucket_versioning" "this" {
@@ -165,10 +161,6 @@ resource "aws_s3_bucket" "access_logs" {
 
   bucket        = "${local.prefix}-${local.account}-connect-${local.lob}-${local.sdlc_env}-access-logs-${local.aws_region_abbr}"
   force_destroy = var.force_destroy
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${local.account}-connect-${local.lob}-${local.sdlc_env}-access-logs-${local.aws_region_abbr}"
-  })
 }
 
 resource "aws_s3_bucket_public_access_block" "access_logs" {

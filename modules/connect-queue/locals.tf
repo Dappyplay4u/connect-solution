@@ -10,8 +10,4 @@ locals {
 
   # Resolve instance_id — use the variable directly or look it up by alias
   instance_id = var.instance_id != null ? var.instance_id : data.aws_connect_instance.this[0].id
-
-  common_tags = merge(var.tags, {
-    sdlc_env = local.sdlc_env
-  })
 }

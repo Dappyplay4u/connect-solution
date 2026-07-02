@@ -22,10 +22,6 @@ resource "aws_kinesis_stream" "this" {
 
   encryption_type = "KMS"
   kms_key_id      = var.kms_key_id
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${each.value.account}-connect-${local.lob}-${each.value.stream_name}-datastream-${local.aws_region_abbr}"
-  })
 }
 
 # ── IAM Role for Kinesis Firehose ─────────────────────────────────────────────
@@ -48,10 +44,6 @@ resource "aws_iam_role" "firehose" {
         StringEquals = { "sts:ExternalId" = local.account_id }
       }
     }]
-  })
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${local.account}-connect-${local.lob}-firehose-role"
   })
 }
 
@@ -140,10 +132,6 @@ resource "aws_kinesis_firehose_delivery_stream" "ctr" {
       log_stream_name = "S3Delivery"
     }
   }
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${local.account}-connect-${local.lob}-agent-events-deliverystreams-${local.aws_region_abbr}"
-  })
 }
 
 # ── CloudWatch Alarms: iterator age ──────────────────────────────────────────
@@ -168,8 +156,4 @@ resource "aws_cloudwatch_metric_alarm" "iterator_age" {
 
   alarm_actions = var.alarm_sns_topic_arns
   ok_actions    = var.alarm_sns_topic_arns
-
-  tags = merge(local.common_tags, {
-    Name = "${local.prefix}-${each.value.account}-connect-${local.lob}-${each.value.stream_name}-iterator-age-high"
-  })
 }

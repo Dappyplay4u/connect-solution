@@ -53,9 +53,4 @@ locals {
   create_kms     = length(local.kms_keys_to_create) > 0 ? 1 : 0
   create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
   create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
-
-  common_tags = merge(var.tags, {
-    sdlc_env       = local.sdlc_env
-    instance_alias = local.instance_alias
-  })
 }

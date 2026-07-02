@@ -31,6 +31,4 @@ resource "aws_connect_quick_connect" "this" {
       }
     }
   }
-
-  tags = merge(local.common_tags, { qc_key = each.key })
 }

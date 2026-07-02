@@ -148,25 +148,3 @@ variable "alarm_sns_topic_arns" {
   type        = list(string)
   default     = []
 }
-
-# ── Tags ──────────────────────────────────────────────────────────────────────
-
-variable "tags" {
-  description = "Required and optional tags — validated for all 8 mandatory keys"
-  type        = map(string)
-  default     = {}
-
-  validation {
-    condition = alltrue([
-      contains(keys(var.tags), "business_application_id"),
-      contains(keys(var.tags), "cost_center"),
-      contains(keys(var.tags), "created_by"),
-      contains(keys(var.tags), "technical_support_by"),
-      contains(keys(var.tags), "application_group"),
-      contains(keys(var.tags), "technical_environment"),
-      contains(keys(var.tags), "security_data_application"),
-      contains(keys(var.tags), "business_application_code"),
-    ])
-    error_message = "tags must include all 8 required tag keys."
-  }
-}

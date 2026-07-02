@@ -22,6 +22,4 @@ resource "aws_connect_hours_of_operation" "this" {
       }
     }
   }
-
-  tags = merge(local.common_tags, { hoo_key = each.key })
 }

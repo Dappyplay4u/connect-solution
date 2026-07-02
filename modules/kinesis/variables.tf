@@ -133,24 +133,3 @@ variable "existing_media_arn" {
   type        = string
   default     = ""
 }
-
-# ── Tags ──────────────────────────────────────────────────────────────────────
-
-variable "tags" {
-  type    = map(string)
-  default = {}
-
-  validation {
-    condition = alltrue([
-      contains(keys(var.tags), "business_application_id"),
-      contains(keys(var.tags), "cost_center"),
-      contains(keys(var.tags), "created_by"),
-      contains(keys(var.tags), "technical_support_by"),
-      contains(keys(var.tags), "application_group"),
-      contains(keys(var.tags), "technical_environment"),
-      contains(keys(var.tags), "security_data_application"),
-      contains(keys(var.tags), "business_application_code"),
-    ])
-    error_message = "tags must include all 8 required tag keys."
-  }
-}

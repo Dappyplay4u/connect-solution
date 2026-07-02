@@ -76,6 +76,4 @@ module "hours_of_operation" {
     }
 
   }
-
-  tags = local.required_tags
 }

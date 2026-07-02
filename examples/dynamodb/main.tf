@@ -56,6 +56,4 @@ module "connect_tables" {
   existing_iam_role_arn       = var.existing_iam_role_arn
   kms_master_key_id           = var.kms_master_key_id
   iam_permission_boundary_arn = var.iam_permission_boundary_arn
-
-  tags = local.required_tags
 }

@@ -46,8 +46,4 @@ locals {
   # Resolved ARNs — use existing if provided, else fall through to created stream
   resolved_ctr_arn   = coalesce(var.existing_ctr_arn, try(aws_kinesis_stream.this["contact_trace_records"].arn, ""))
   resolved_media_arn = coalesce(var.existing_media_arn, try(aws_kinesis_stream.this["media_streams"].arn, ""))
-
-  common_tags = merge(var.tags, {
-    sdlc_env = local.sdlc_env
-  })
 }

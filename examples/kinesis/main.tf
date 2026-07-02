@@ -38,6 +38,4 @@ module "kinesis" {
   enable_cloudwatch_alarms        = true
   iterator_age_alarm_threshold_ms = 60000
   alarm_sns_topic_arns            = var.alarm_sns_topic_arns
-
-  tags = local.required_tags
 }

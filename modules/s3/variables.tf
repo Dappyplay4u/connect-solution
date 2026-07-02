@@ -86,30 +86,3 @@ variable "noncurrent_version_expiration_days" {
   type        = number
   default     = 90
 }
-
-# ── Tags ──────────────────────────────────────────────────────────────────────
-
-variable "tags" {
-  description = "Required and optional tags applied to all S3 resources"
-  type        = map(string)
-  default     = {}
-
-  validation {
-    condition = alltrue([
-      contains(keys(var.tags), "business_application_id"),
-      contains(keys(var.tags), "cost_center"),
-      contains(keys(var.tags), "created_by"),
-      contains(keys(var.tags), "technical_support_by"),
-      contains(keys(var.tags), "application_group"),
-      contains(keys(var.tags), "technical_environment"),
-      contains(keys(var.tags), "security_data_application"),
-      contains(keys(var.tags), "business_application_code"),
-    ])
-    error_message = <<-EOT
-      tags must include all 8 required keys:
-      business_application_id, cost_center, created_by, technical_support_by,
-      application_group, technical_environment, security_data_application,
-      business_application_code.
-    EOT
-  }
-}

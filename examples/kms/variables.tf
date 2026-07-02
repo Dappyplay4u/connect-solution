@@ -32,14 +32,3 @@ variable "key_admin_arns" {
   type        = list(string)
   default     = []
 }
-
-# ── Required Tags ──────────────────────────────────────────────────────────────
-
-variable "business_application_id"   { type = string }
-variable "cost_center"               { type = string }
-variable "created_by"                { type = string }
-variable "technical_support_by"      { type = string }
-variable "application_group"         { type = string }
-variable "technical_environment"     { type = string }
-variable "security_data_application" { type = string }
-variable "business_application_code" { type = string }

@@ -39,6 +39,4 @@ module "quick_connect" {
     local.phone_quick_connects,   # PHONE_NUMBER — from local.phone_number_entries
     local.user_quick_connects,    # USER         — from local.user_entries
   )
-
-  tags = local.required_tags
 }

@@ -32,6 +32,4 @@ module "s3" {
   lifecycle_glacier_transition_days  = 365
   lifecycle_expiration_days          = 2555
   noncurrent_version_expiration_days = 90
-
-  tags = local.required_tags
 }

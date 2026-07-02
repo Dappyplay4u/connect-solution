@@ -30,8 +30,6 @@ module "kms" {
   key_admin_arns = var.key_admin_arns
 
   kms_keys = local.kms_keys_to_create
-
-  tags = var.tags
 }
 
 ###############################################################################
@@ -57,8 +55,6 @@ module "s3" {
   lifecycle_glacier_transition_days  = 365
   lifecycle_expiration_days          = 2555
   noncurrent_version_expiration_days = 90
-
-  tags = var.tags
 
   depends_on = [module.kms]
 }
@@ -97,8 +93,6 @@ module "kinesis" {
   iterator_age_alarm_threshold_ms = 60000
   alarm_sns_topic_arns            = var.alarm_sns_topic_arns
 
-  tags = var.tags
-
   depends_on = [module.kms, module.s3]
 }
 
@@ -117,10 +111,6 @@ resource "aws_connect_instance" "this" {
   early_media_enabled              = true
   multi_party_conference_enabled   = true
   auto_resolve_best_voices_enabled = var.auto_resolve_best_voices_enabled
-
-  tags = merge(local.common_tags, {
-    Name = local.instance_alias
-  })
 
   depends_on = [module.kms, module.s3, module.kinesis]
 }
@@ -242,8 +232,4 @@ resource "aws_cloudwatch_log_group" "contact_flow" {
   name              = "/aws/connect/${local.instance_alias}"
   retention_in_days = var.log_retention_days
   kms_key_id        = local.kms_connect_arn
-
-  tags = merge(local.common_tags, {
-    Name = "/aws/connect/${local.instance_alias}"
-  })
 }

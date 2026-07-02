@@ -45,8 +45,6 @@ module "hours" {
     }
 
   }
-
-  tags = local.required_tags
 }
 
 # ---------------------------------------------------------------------------
@@ -183,6 +181,4 @@ module "queues" {
     },
 
   )
-
-  tags = local.required_tags
 }

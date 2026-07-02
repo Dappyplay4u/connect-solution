@@ -101,27 +101,3 @@ variable "hours_of_operation" {
     error_message = "Each config day must be one of MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY."
   }
 }
-
-# ---------------------------------------------------------------------------
-# Tags
-# ---------------------------------------------------------------------------
-
-variable "tags" {
-  description = "Tags applied to all resources. Must include the 8 required enterprise tag keys."
-  type        = map(string)
-  default     = {}
-
-  validation {
-    condition = alltrue([
-      contains(keys(var.tags), "business_application_id"),
-      contains(keys(var.tags), "cost_center"),
-      contains(keys(var.tags), "created_by"),
-      contains(keys(var.tags), "technical_support_by"),
-      contains(keys(var.tags), "application_group"),
-      contains(keys(var.tags), "technical_environment"),
-      contains(keys(var.tags), "security_data_application"),
-      contains(keys(var.tags), "business_application_code"),
-    ])
-    error_message = "tags must include all 8 required tag keys."
-  }
-}

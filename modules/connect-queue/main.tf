@@ -15,6 +15,4 @@ resource "aws_connect_queue" "this" {
     outbound_caller_id_number_id = try(each.value.outbound_caller_config.outbound_caller_id_number_id, null)
     outbound_flow_id             = try(each.value.outbound_caller_config.outbound_flow_id, null)
   }
-
-  tags = merge(local.common_tags, { queue_key = each.key })
 }

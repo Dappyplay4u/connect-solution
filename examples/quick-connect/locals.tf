@@ -1,14 +1,4 @@
 locals {
-  required_tags = {
-    business_application_id   = var.business_application_id
-    cost_center               = var.cost_center
-    created_by                = var.created_by
-    technical_support_by      = var.technical_support_by
-    application_group         = var.application_group
-    technical_environment     = var.technical_environment
-    security_data_application = var.security_data_application
-    business_application_code = var.business_application_code
-  }
 
   # ---------------------------------------------------------------------------
   # Instance resolution
@@ -168,24 +158,22 @@ locals {
   }
 
   # ---------------------------------------------------------------------------
-  # User (agent) entries — add / remove agent transfer shortcuts here.
-  # All entries share transfer_to_agent_flow_id from variables.tf.
-  # user_id is the Connect User ID — not the IAM or SSO user ID.
+  # User (agent) names — add / remove agent usernames here.
+  # Username is the Connect login (typically an email address or AD identity).
+  # Connect User IDs are resolved automatically via the aws_connect_user data source.
   # ---------------------------------------------------------------------------
-  user_entries = {
-    # "senior-agent-john" = {
-    #   description = "John - Senior Agent"
-    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    # }
-    # "senior-agent-sarah" = {
-    #   description = "Sarah - Team Lead"
-    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    # }
-    # "supervisor-mike" = {
-    #   description = "Mike - Supervisor"
-    #   user_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    # }
-  }
+  user_names = [
+    # "john.doe@company.com",
+    # "sarah.smith@company.com",
+    # "mike.jones@company.com",
+  ]
+
+  # Users to look up — excludes any username in var.users_to_skip.
+  # Use users_to_skip for users that don't exist in Connect yet.
+  users_to_lookup = [
+    for u in local.user_names : u
+    if !contains(var.users_to_skip, u)
+  ]
 
   # ---------------------------------------------------------------------------
   # PHONE_NUMBER-type quick connects — built from phone_number_entries above.
@@ -199,15 +187,15 @@ locals {
   }
 
   # ---------------------------------------------------------------------------
-  # USER-type quick connects — built from user_entries above.
+  # USER-type quick connects — built from data source results.
   # Skipped entirely when transfer_to_agent_flow_id is not provided.
   # ---------------------------------------------------------------------------
   user_quick_connects = var.transfer_to_agent_flow_id != null ? {
-    for k, v in local.user_entries : k => {
+    for name, ds in data.aws_connect_user.this : name => {
       type            = "USER"
-      description     = v.description
+      description     = "Transfer to ${ds.name}"
       contact_flow_id = var.transfer_to_agent_flow_id
-      user_id         = v.user_id
+      user_id         = ds.user_id
     }
   } : {}
 

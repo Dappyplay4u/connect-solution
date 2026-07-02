@@ -96,10 +96,6 @@ resource "aws_kms_key" "this" {
   multi_region            = false
 
   policy = each.value.policy != null ? each.value.policy : data.aws_iam_policy_document.this[each.key].json
-
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-${each.key}-key"
-  })
 }
 
 resource "aws_kms_alias" "this" {

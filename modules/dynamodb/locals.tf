@@ -10,8 +10,6 @@ locals {
   region     = data.aws_region.current.region
   partition  = data.aws_partition.current.partition
 
-  common_tags = var.tags
-
   csv_bucket_name = "${local.name_prefix}-ddb-csv"
   lambda_name     = "${local.name_prefix}-ddb-loader"
   iam_role_name   = "${local.name_prefix}-ddb-loader-role"

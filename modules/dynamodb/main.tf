@@ -49,8 +49,6 @@ resource "aws_dynamodb_table" "this" {
     enabled     = true
     kms_key_arn = var.kms_master_key_id
   }
-
-  tags = merge(local.common_tags, { table_key = each.key })
 }
 
 # ---------------------------------------------------------------------------
@@ -59,7 +57,6 @@ resource "aws_dynamodb_table" "this" {
 
 resource "aws_s3_bucket" "csv" {
   bucket = local.csv_bucket_name
-  tags   = local.common_tags
 }
 
 resource "aws_s3_bucket_versioning" "csv" {
@@ -169,7 +166,6 @@ resource "aws_iam_role" "csv_loader" {
     }]
   })
 
-  tags = local.common_tags
 }
 
 resource "aws_iam_role_policy" "csv_loader" {
@@ -238,7 +234,6 @@ resource "aws_cloudwatch_log_group" "csv_loader" {
   retention_in_days = var.lambda_log_retention_days
   kms_key_id        = var.kms_master_key_id
 
-  tags = local.common_tags
 }
 
 # ---------------------------------------------------------------------------
@@ -263,7 +258,6 @@ resource "aws_lambda_function" "csv_loader" {
 
   depends_on = [aws_cloudwatch_log_group.csv_loader]
 
-  tags = local.common_tags
 }
 
 # ---------------------------------------------------------------------------
