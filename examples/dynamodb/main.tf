@@ -11,23 +11,22 @@ module "connect_tables" {
   # S3 upload folder:    <key>/your-file.csv
   #
   # Sample CSV files for manual testing are in the data/ folder:
-  #   data/agent-configuration/sample.csv
+  #   data/agent-configurations/sample.csv
   #   data/DNIS-mapping/sample.csv
-  #   data/ivr-parameters-/sample.csv
-  #   data/ivr-pilot-phone-numbers/sample.csv
-  #   data/office-hours-/sample.csv
+  #   data/office-hours/sample.csv
   #   data/prompts/sample.csv
   # ---------------------------------------------------------------------------
   tables = {
 
-    # ls-connect-agent-configuration-uw2
-    "agent-configuration" = {
-      hash_key = "AgentId"
+    # ls-connect-agent-configurations-uw2
+    "agent-configurations" = {
+      hash_key              = "agentName"
+      csv_number_attributes = ["agentExtensionId", "DID", "NLMSId"]
     }
 
     # ls-connect-DNIS-mapping-uw2
     "DNIS-mapping" = {
-      hash_key = "DNIS"
+      hash_key = "TFN"
     }
 
     # ls-connect-ivr-parameters--uw2
@@ -40,14 +39,22 @@ module "connect_tables" {
       hash_key = "PhoneNumber"
     }
 
-    # ls-connect-office-hours--uw2
-    "office-hours-" = {
-      hash_key = "OfficeId"
+    # ls-connect-office-hours-uw2
+    "office-hours" = {
+      hash_key      = "type"
+      range_key     = "sequenceId"
+      billing_mode  = "PROVISIONED"
+      read_capacity = 10
+      write_capacity = 5
     }
 
     # ls-connect-prompts-uw2
     "prompts" = {
-      hash_key = "PromptId"
+      hash_key       = "category"
+      range_key      = "promptName"
+      billing_mode   = "PROVISIONED"
+      read_capacity  = 10
+      write_capacity = 5
     }
 
   }

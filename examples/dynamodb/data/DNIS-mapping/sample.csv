@@ -1,5 +1,9 @@
-DNIS,FlowName,QueueName,Description,Active
-+18005551001,MainBillingFlow,BillingQueue,Main billing line,true
-+18005551002,SalesFlow,SalesQueue,Main sales line,true
-+18005551003,SupportFlow,SupportQueue,Technical support line,true
-+18005551004,AfterHoursFlow,AfterHoursQueue,After hours overflow,true
+TFN,LOB,queueARN,queueName,TFNType,WHCType
+8335870039,,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee,,MLA Line,MLA Line
+8335940817,,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/bbbbbbbb-cccc-dddd-eeee-ffffffffffff,Branch Line,Branch Line,Branch Line
+8335190388,,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/cccccccc-dddd-eeee-ffff-aaaaaaaaaaaa,,Deposit Fraud,Deposit Fraud
+1233456756,LS,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/dddddddd-eeee-ffff-aaaa-bbbbbbbbbbbb,,Deposit Fraud,Deposit Fraud
+8335850924,,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/eeeeeeee-ffff-aaaa-bbbb-cccccccccccc,,Underwriter Line,Underwriter Line
+8335710973,,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/ffffffff-aaaa-bbbb-cccc-dddddddddddd,Fraud Line,Fraud Line,Fraud Line
+5934408234,LS,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/gggggggg-hhhh-iiii-jjjj-kkkkkkkkkkkk,,Branch Line,Branch Line
+8335850978,LS,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/queue/hhhhhhhh-iiii-jjjj-kkkk-llllllllllll,Funding Line,Funding Line,Funding Line

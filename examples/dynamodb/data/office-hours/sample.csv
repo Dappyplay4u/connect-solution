@@ -1,0 +1,12 @@
+type,sequenceId,callbackTurnedOnFlag,date,day,emergencyFlag,endTime,fireDrillFlag,holidayPartyFlag,LOB,meetingAllFlag,meetingFlag,message,phonesDownFlag,startTime,weatherFlag,WHCType
+Fire Drill,1,,,,,,FALSE,,,,,<speak>We are currently experiencing a fire drill. Please call back shortly.</speak>,,,, Main
+Holiday Party,1,,,,,,,FALSE,LS,,,<speak>Our office is closed for a company holiday event. Please call back tomorrow.</speak>,,,,Main
+Phones Down,1,,,,,,,,LS,,,<speak>We are experiencing a phone system outage. Please try again later.</speak>,FALSE,,,Main
+WHC,100,,,Thursday,,,,,LS,,,<speak>Thank you for calling. Our office hours are Monday through Friday 6 AM to 5 PM.</speak>,,06:00 AM,,Funding Line
+WHC,101,,,Wednesday,,,,,LS,,,<speak>Thank you for calling. Our office hours are Monday through Friday 6 AM to 5 PM.</speak>,,06:00 AM,,Funding Line
+WHC,102,,,Tuesday,,,,,LS,,,<speak>Thank you for calling. Our office hours are Monday through Friday 6 AM to 2 PM.</speak>,,06:00 AM,,Funding Line
+WHC,103,,,Monday,,,,,LS,,,<speak>Thank you for calling. Our office hours are Monday through Friday 6 AM to 5 PM.</speak>,,06:00 AM,,Funding Line
+WHC,104,,,Friday,,,,,LS,,,<speak>Thank you for calling. Our office hours are Monday through Friday 6 AM to 5 PM.</speak>,,05:00 AM,,Funding Line
+WHC,105,,,Saturday,,,,,LS,,,<speak>Thank you for calling. Our office is closed on weekends.</speak>,,08:00 AM,,Funding Line
+Emergency,106,,,,,,,,,,,<speak>We are currently closed due to an emergency. Please call back later.</speak>,,,, Funding Line
+Meeting,12,,,,FALSE,,,,LS,,FALSE,<speak>All agents are currently in a meeting. Please hold or call back shortly.</speak>,,,,Main

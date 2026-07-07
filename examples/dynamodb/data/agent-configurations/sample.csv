@@ -1,0 +1,4 @@
+agentName,agentARN,agentExtensionId,agentId,avayaAgentId,DID,NLMSId,voicemailNumber
+john.doe@company.com,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/agent/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee,1001,aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee,,8005551001,1001001,+18005551001
+jane.smith@company.com,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/agent/bbbbbbbb-cccc-dddd-eeee-ffffffffffff,1002,bbbbbbbb-cccc-dddd-eeee-ffffffffffff,,8005551002,1001002,+18005551002
+mike.jones@company.com,arn:aws:connect:us-west-2:123456789012:instance/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/agent/cccccccc-dddd-eeee-ffff-aaaaaaaaaaaa,1003,cccccccc-dddd-eeee-ffff-aaaaaaaaaaaa,,8005551003,,

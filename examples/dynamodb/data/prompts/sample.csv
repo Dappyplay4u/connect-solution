@@ -1,6 +1,14 @@
-PromptId,PromptName,S3Location,Language,Description
-prompt-001,welcome-en,prompts/welcome_en.wav,en-US,Main welcome greeting
-prompt-002,hold-music,prompts/hold_music.wav,en-US,Hold music loop
-prompt-003,after-hours-en,prompts/after_hours_en.wav,en-US,After hours message
-prompt-004,queue-position-en,prompts/queue_position_en.wav,en-US,Your position in queue is
-prompt-005,goodbye-en,prompts/goodbye_en.wav,en-US,Thank you for calling goodbye
+category,promptName,LOB,plain,SSML
+LS_IVR_Welcome_CF,LS_IVR_MenuDefault_Prompt,LS,We didn't get that let's try again,<amazon:domain name="conversational">We didn't get that, let's try again</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_MenuRepeat_Prompt,LS,Here are your options again,<amazon:domain name="conversational">Here are your options again, </amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_Menu_Prompt,LS,For information about an existing account press 1,<amazon:domain name="conversational">For information about an existing account, press 1.</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_Menu_option3_Prompt,LS,We are unable to accept applications over the phone,<amazon:domain name="conversational">We are unable to accept applications over the phone.</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_Menu_option4_Prompt,LS,To view our current interest rates please visit our website,<amazon:domain name="conversational">To view our current interest rates, please visit our website.</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_QueueConnect_Prompt,LS,To speak to a representative press 0,<amazon:domain name="conversational">To speak to a representative, press 0.</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_RecordingDisclaimer_Prompt,LS,Your call may be recorded for quality and training purposes,<amazon:domain name="conversational">Your call may be recorded for quality and training purposes.</amazon:domain>
+LS_IVR_Welcome_CF,LS_IVR_welcome_Prompt,LS,Thank you for calling Lightstream,<amazon:domain name="conversational">Thank you for calling Lightstream. </amazon:domain>
+LS_WaitTimePrompt_CF,LS_FifteenMinutes_Prompt,LS,Your estimated wait time is between 15 and 20 minutes,<amazon:domain name="conversational">Your estimated wait time, is between 15 and 20 minutes. We appreciate your patience.</amazon:domain>
+LS_WaitTimePrompt_CF,LS_FiftyFiveMinutes_Prompt,LS,Your estimated wait time is between 55 and 60 minutes,<amazon:domain name="conversational">Your estimated wait time, is between 55 and 60 minutes. We appreciate your patience.</amazon:domain>
+LS_WaitTimePrompt_CF,LS_FiftyMinutes_Prompt,LS,Your estimated wait time is between 50 and 55 minutes,<amazon:domain name="conversational">Your estimated wait time, is between 50 and 55 minutes. We appreciate your patience.</amazon:domain>
+LS_WaitTimePrompt_CF,LS_FiveMinutes_Prompt,LS,Your estimated wait time is between 5 and 10 minutes,<amazon:domain name="conversational">Your estimated wait time, is between 5 and 10 minutes. We appreciate your patience.</amazon:domain>
+LS_WaitTimePrompt_CF,LS_FortyFiveMinutes_Prompt,LS,Your estimated wait time is between 45 and 50 minutes,<amazon:domain name="conversational">Your estimated wait time, is between 45 and 50 minutes. We appreciate your patience.</amazon:domain>
