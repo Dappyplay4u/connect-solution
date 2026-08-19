@@ -39,14 +39,11 @@ module "connect" {
   existing_kinesis_ctr_arn         = var.existing_kinesis_ctr_arn
   existing_kinesis_media_arn       = var.existing_kinesis_media_arn
 
-  # ── Storage prefix overrides ─────────────────────────────────────────────────
-  # Set these when the Connect instance was previously configured with different
-  # S3 folder paths or a different Kinesis Video Stream prefix.
-  # Leave null in regions where resources are newly created by this module.
-  call_recordings_bucket_prefix   = var.call_recordings_bucket_prefix
-  scheduled_reports_bucket_prefix = var.scheduled_reports_bucket_prefix
-  chat_transcripts_bucket_prefix  = var.chat_transcripts_bucket_prefix
-  media_streams_prefix            = var.media_streams_prefix
+  # ── Storage config overrides ─────────────────────────────────────────────────
+  # Only set fields that differ from the module defaults.
+  # Read current values from state before setting:
+  #   terraform state show 'module.connect.aws_connect_instance_storage_config.call_recordings'
+  storage_overrides = var.storage_overrides
 
   # ── KMS admin ARNs ───────────────────────────────────────────────────────────
   key_admin_arns = var.key_admin_arns

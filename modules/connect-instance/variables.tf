@@ -149,31 +149,32 @@ variable "alarm_sns_topic_arns" {
   default     = []
 }
 
-# ── Storage prefix overrides ──────────────────────────────────────────────────
-# Use these when the Connect instance was previously configured with different
-# S3 folder paths or a different Kinesis Video Stream prefix. Leaving them null
-# uses the module defaults, which is correct for new deployments.
+# ── Storage config overrides ──────────────────────────────────────────────────
+# Use when the Connect instance was previously configured with values that differ
+# from the module defaults. Only set the fields that need to change — everything
+# else falls through to the module default. New fields can be added here for
+# future BU requirements without breaking existing callers.
 
-variable "call_recordings_bucket_prefix" {
-  description = "S3 folder prefix for call recordings in Connect storage config. Default: 'call-recordings'."
-  type        = string
-  default     = null
-}
-
-variable "scheduled_reports_bucket_prefix" {
-  description = "S3 folder prefix for scheduled reports in Connect storage config. Default: 'scheduled-reports'."
-  type        = string
-  default     = null
-}
-
-variable "chat_transcripts_bucket_prefix" {
-  description = "S3 folder prefix for chat transcripts in Connect storage config. Default: 'chat-transcripts'."
-  type        = string
-  default     = null
-}
-
-variable "media_streams_prefix" {
-  description = "Kinesis Video Stream prefix for media streams in Connect storage config. Default: '<name_prefix>-media'."
-  type        = string
-  default     = null
+variable "storage_overrides" {
+  description = <<-EOT
+    Per-resource storage config overrides. Set only the fields that differ from
+    the module defaults. Correct values can be read from state:
+      terraform state show 'module.connect.aws_connect_instance_storage_config.call_recordings'
+  EOT
+  type = object({
+    call_recordings = optional(object({
+      bucket_prefix = optional(string) # default: "call-recordings"
+    }), {})
+    scheduled_reports = optional(object({
+      bucket_prefix = optional(string) # default: "scheduled-reports"
+    }), {})
+    chat_transcripts = optional(object({
+      bucket_prefix = optional(string) # default: "chat-transcripts"
+    }), {})
+    media_streams = optional(object({
+      prefix                 = optional(string) # default: "<name_prefix>-media"
+      retention_period_hours = optional(number) # default: var.media_stream_retention_hours
+    }), {})
+  })
+  default = {}
 }

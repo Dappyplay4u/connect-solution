@@ -33,11 +33,16 @@ existing_s3_chat_transcripts_id  = ""
 existing_kinesis_ctr_arn   = ""
 existing_kinesis_media_arn = ""
 
-# ── Storage prefix overrides ─────────────────────────────────────────────────
-# The Connect instance was previously configured with these folder paths.
-# Must match what is currently set in the Connect console for this instance.
-call_recordings_bucket_prefix = "connect/lightstream-dev-uw2/CallRecordings"
-media_streams_prefix          = "ls-connect-audiostream-uw2-"
+# ── Storage config overrides ─────────────────────────────────────────────────
+# Values read from: terraform state show 'module.connect.aws_connect_instance_storage_config.*'
+storage_overrides = {
+  call_recordings = {
+    bucket_prefix = "connect/lightstream-dev-uw2/CallRecordings"
+  }
+  media_streams = {
+    prefix = "ls-connect-audiostream-uw2-"
+  }
+}
 
 # ── Alerting ─────────────────────────────────────────────────────────────────
 alarm_sns_topic_arns = [

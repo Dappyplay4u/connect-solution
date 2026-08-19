@@ -214,7 +214,7 @@ resource "aws_connect_instance_storage_config" "media_streams" {
 
     kinesis_video_stream_config {
       prefix                 = local.media_streams_prefix
-      retention_period_hours = var.media_stream_retention_hours
+      retention_period_hours = local.media_streams_retention
 
       encryption_config {
         encryption_type = "KMS"

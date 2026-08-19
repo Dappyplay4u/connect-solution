@@ -81,30 +81,25 @@ variable "existing_kinesis_media_arn" {
   default = ""
 }
 
-# ── Storage prefix overrides ──────────────────────────────────────────────────
+# ── Storage config overrides ──────────────────────────────────────────────────
 
-variable "call_recordings_bucket_prefix" {
-  description = "S3 folder prefix for call recordings. Null = module default 'call-recordings'."
-  type        = string
-  default     = null
-}
-
-variable "scheduled_reports_bucket_prefix" {
-  description = "S3 folder prefix for scheduled reports. Null = module default 'scheduled-reports'."
-  type        = string
-  default     = null
-}
-
-variable "chat_transcripts_bucket_prefix" {
-  description = "S3 folder prefix for chat transcripts. Null = module default 'chat-transcripts'."
-  type        = string
-  default     = null
-}
-
-variable "media_streams_prefix" {
-  description = "Kinesis Video Stream prefix. Null = module default '<name_prefix>-media'."
-  type        = string
-  default     = null
+variable "storage_overrides" {
+  type = object({
+    call_recordings = optional(object({
+      bucket_prefix = optional(string)
+    }), {})
+    scheduled_reports = optional(object({
+      bucket_prefix = optional(string)
+    }), {})
+    chat_transcripts = optional(object({
+      bucket_prefix = optional(string)
+    }), {})
+    media_streams = optional(object({
+      prefix                 = optional(string)
+      retention_period_hours = optional(number)
+    }), {})
+  })
+  default = {}
 }
 
 # ── Supporting ────────────────────────────────────────────────────────────────

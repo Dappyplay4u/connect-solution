@@ -54,11 +54,12 @@ locals {
   create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
   create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
 
-  # Resolved storage prefixes — override when importing an instance that was
-  # previously configured with a different folder path or KVS prefix.
-  # New deployments should leave the vars null and pick up the defaults below.
-  call_recordings_prefix   = coalesce(var.call_recordings_bucket_prefix, "call-recordings")
-  scheduled_reports_prefix = coalesce(var.scheduled_reports_bucket_prefix, "scheduled-reports")
-  chat_transcripts_prefix  = coalesce(var.chat_transcripts_bucket_prefix, "chat-transcripts")
-  media_streams_prefix     = coalesce(var.media_streams_prefix, "${local.name_prefix}-media")
+  # Resolved storage config values — fall back to module defaults when a field
+  # is not present in var.storage_overrides. Add new fields here as future BUs
+  # require them; existing callers never need to change their tfvars.
+  call_recordings_prefix   = coalesce(try(var.storage_overrides.call_recordings.bucket_prefix, null), "call-recordings")
+  scheduled_reports_prefix = coalesce(try(var.storage_overrides.scheduled_reports.bucket_prefix, null), "scheduled-reports")
+  chat_transcripts_prefix  = coalesce(try(var.storage_overrides.chat_transcripts.bucket_prefix, null), "chat-transcripts")
+  media_streams_prefix     = coalesce(try(var.storage_overrides.media_streams.prefix, null), "${local.name_prefix}-media")
+  media_streams_retention  = coalesce(try(var.storage_overrides.media_streams.retention_period_hours, null), var.media_stream_retention_hours)
 }

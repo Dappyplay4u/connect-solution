@@ -33,13 +33,21 @@ existing_s3_chat_transcripts_id  = "truistmessaging-connectdata-qa"
 existing_kinesis_ctr_arn   = "arn:aws:kinesis:us-east-1:<account_id>:stream/<ctr-stream-name>"
 existing_kinesis_media_arn = "arn:aws:kinesis:us-east-1:<account_id>:stream/<media-stream-name>"
 
-# ── Storage prefix overrides ─────────────────────────────────────────────────
-# The Connect instance in this region was configured with these paths.
-# Overriding prevents Terraform from changing where recordings/transcripts land.
-call_recordings_bucket_prefix  = "connect/retail-qa-ue1/CallRecordings"
-chat_transcripts_bucket_prefix = "connect/retail-qa-ue1/ChatTranscripts"
-media_streams_prefix           = "my-connect-retail-qa-ue1-contact-"
-# scheduled_reports_bucket_prefix = null   # leave null → uses module default
+# ── Storage config overrides ─────────────────────────────────────────────────
+# Values read from: terraform state show 'module.connect.aws_connect_instance_storage_config.*'
+# Only set fields that differ from the module defaults.
+# scheduled_reports is omitted — module default "scheduled-reports" already matches.
+storage_overrides = {
+  call_recordings = {
+    bucket_prefix = "connect/retail-qa-ue1/CallRecordings"
+  }
+  chat_transcripts = {
+    bucket_prefix = "connect/retail-qa-ue1/ChatTranscripts"
+  }
+  media_streams = {
+    prefix = "my-connect-retail-qa-ue1-contact-"
+  }
+}
 
 # ── Alerting ─────────────────────────────────────────────────────────────────
 alarm_sns_topic_arns = [

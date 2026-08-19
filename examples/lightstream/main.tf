@@ -39,11 +39,8 @@ module "connect" {
   existing_kinesis_ctr_arn         = var.existing_kinesis_ctr_arn
   existing_kinesis_media_arn       = var.existing_kinesis_media_arn
 
-  # ── Storage prefix overrides ─────────────────────────────────────────────────
-  call_recordings_bucket_prefix   = var.call_recordings_bucket_prefix
-  scheduled_reports_bucket_prefix = var.scheduled_reports_bucket_prefix
-  chat_transcripts_bucket_prefix  = var.chat_transcripts_bucket_prefix
-  media_streams_prefix            = var.media_streams_prefix
+  # ── Storage config overrides ─────────────────────────────────────────────────
+  storage_overrides = var.storage_overrides
 
   # ── KMS admin ARNs ───────────────────────────────────────────────────────────
   key_admin_arns = var.key_admin_arns
