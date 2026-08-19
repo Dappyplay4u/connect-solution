@@ -40,23 +40,50 @@ locals {
   kms_kinesis_id  = var.existing_kms_kinesis_arn != "" ? var.existing_kms_kinesis_arn : try(module.kms[0].kinesis_key_id, null)
   kms_connect_arn = var.existing_kms_connect_arn != "" ? var.existing_kms_connect_arn : try(module.kms[0].connect_key_arn, null)
 
-  # Resolved S3 bucket IDs
-  s3_call_recordings_id   = var.existing_s3_call_recordings_id != "" ? var.existing_s3_call_recordings_id : try(module.s3[0].call_recordings_bucket_id, null)
-  s3_scheduled_reports_id = var.existing_s3_scheduled_reports_id != "" ? var.existing_s3_scheduled_reports_id : try(module.s3[0].scheduled_reports_bucket_id, null)
-  s3_chat_transcripts_id  = var.existing_s3_chat_transcripts_id != "" ? var.existing_s3_chat_transcripts_id : try(module.s3[0].chat_transcripts_bucket_id, null)
+  # ── Resolved S3 bucket IDs ───────────────────────────────────────────────────
+  # Priority: storage_overrides.*.bucket_name → existing_s3_* → module-created
+  s3_call_recordings_id = coalesce(
+    try(var.storage_overrides.call_recordings.bucket_name, null),
+    var.existing_s3_call_recordings_id != "" ? var.existing_s3_call_recordings_id : null,
+    try(module.s3[0].call_recordings_bucket_id, null)
+  )
+  s3_scheduled_reports_id = coalesce(
+    try(var.storage_overrides.scheduled_reports.bucket_name, null),
+    var.existing_s3_scheduled_reports_id != "" ? var.existing_s3_scheduled_reports_id : null,
+    try(module.s3[0].scheduled_reports_bucket_id, null)
+  )
+  s3_chat_transcripts_id = coalesce(
+    try(var.storage_overrides.chat_transcripts.bucket_name, null),
+    var.existing_s3_chat_transcripts_id != "" ? var.existing_s3_chat_transcripts_id : null,
+    try(module.s3[0].chat_transcripts_bucket_id, null)
+  )
 
-  # Resolved Kinesis stream ARNs — each stream is independently controlled
-  kinesis_ctr_arn   = var.existing_kinesis_ctr_arn != "" ? var.existing_kinesis_ctr_arn : try(module.kinesis[0].ctr_stream_arn, null)
+  # ── Resolved Kinesis stream ARNs ─────────────────────────────────────────────
+  # Priority: storage_overrides.*.stream_arn → existing_kinesis_* → module-created
+  kinesis_ctr_arn = coalesce(
+    try(var.storage_overrides.contact_trace_records.stream_arn, null),
+    var.existing_kinesis_ctr_arn != "" ? var.existing_kinesis_ctr_arn : null,
+    try(module.kinesis[0].ctr_stream_arn, null)
+  )
   kinesis_media_arn = var.existing_kinesis_media_arn != "" ? var.existing_kinesis_media_arn : try(module.kinesis[0].media_stream_arn, null)
 
-  # Whether to create child modules
-  create_kms     = length(local.kms_keys_to_create) > 0 ? 1 : 0
-  create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
-  create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
+  # ── Whether to create child modules ──────────────────────────────────────────
+  create_kms = length(local.kms_keys_to_create) > 0 ? 1 : 0
 
-  # Resolved storage config values — fall back to module defaults when a field
-  # is not present in var.storage_overrides. Add new fields here as future BUs
-  # require them; existing callers never need to change their tfvars.
+  # Skip S3 module when any of the three bucket names are already provided
+  create_s3 = (
+    try(var.storage_overrides.call_recordings.bucket_name, null) == null &&
+    var.existing_s3_call_recordings_id == ""
+  ) ? 1 : 0
+
+  # Skip Kinesis module when both stream ARNs are already provided
+  create_kinesis = (
+    (try(var.storage_overrides.contact_trace_records.stream_arn, null) == null && var.existing_kinesis_ctr_arn == "") ||
+    var.existing_kinesis_media_arn == ""
+  ) ? 1 : 0
+
+  # ── Resolved storage config attribute values ──────────────────────────────────
+  # Add new fields here for future BU requirements; existing callers are unaffected.
   call_recordings_prefix   = coalesce(try(var.storage_overrides.call_recordings.bucket_prefix, null), "call-recordings")
   scheduled_reports_prefix = coalesce(try(var.storage_overrides.scheduled_reports.bucket_prefix, null), "scheduled-reports")
   chat_transcripts_prefix  = coalesce(try(var.storage_overrides.chat_transcripts.bucket_prefix, null), "chat-transcripts")

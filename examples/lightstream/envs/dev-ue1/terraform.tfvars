@@ -1,10 +1,10 @@
 # ---------------------------------------------------------------------------
 # LightStream — DEV (us-east-1)
 #
-# KMS keys exist (shared Truist standard keys) — passed as existing.
-# S3 and Kinesis were previously created manually with non-standard naming.
-# existing_* variables point to those resources; prefix overrides preserve
-# the paths that Connect was already configured with.
+# KMS keys pre-exist (shared Truist standard keys) — passed separately.
+# S3 buckets and Kinesis streams were manually created with non-standard names
+# and imported into state. storage_overrides declares the existing names and
+# the Connect config paths to freeze in place.
 # ---------------------------------------------------------------------------
 
 # ── Region ──────────────────────────────────────────────────────────────────
@@ -19,25 +19,20 @@ account      = "dev"
 lob          = "lightstream"
 sdlc_env     = "dev"
 
-# ── Bring-your-own: KMS keys are shared Truist standard keys ────────────────
+# ── KMS keys (shared Truist standard keys — always bring-your-own) ───────────
 existing_kms_s3_arn      = "arn:aws:kms:us-east-1:014848577183:key/<s3-key-id>"
 existing_kms_kinesis_arn = "arn:aws:kms:us-east-1:014848577183:key/<kinesis-key-id>"
 existing_kms_connect_arn = "arn:aws:kms:us-east-1:014848577183:key/<connect-key-id>"
 
-# Pass existing S3 bucket names (manually created with old naming)
-existing_s3_call_recordings_id   = "ls-connect-ue1-recordings"
-existing_s3_scheduled_reports_id = ""
-existing_s3_chat_transcripts_id  = ""
-
-# Pass existing Kinesis stream ARNs
-existing_kinesis_ctr_arn   = ""
-existing_kinesis_media_arn = ""
-
-# ── Storage config overrides ─────────────────────────────────────────────────
-# Values read from: terraform state show 'module.connect.aws_connect_instance_storage_config.*'
+# ── Storage overrides — all S3 + Kinesis names and Connect config paths ───────
 storage_overrides = {
   call_recordings = {
+    bucket_name   = "ls-connect-ue1-recordings"
     bucket_prefix = "connect/lightstream-dev-uw2/CallRecordings"
+  }
+  # scheduled_reports and chat_transcripts omitted — auto-created with standard names
+  contact_trace_records = {
+    stream_arn = "arn:aws:kinesis:us-east-1:014848577183:stream/<ctr-stream-name>"
   }
   media_streams = {
     prefix = "ls-connect-audiostream-uw2-"
@@ -49,7 +44,6 @@ alarm_sns_topic_arns = [
   "arn:aws:sns:us-east-1:014848577183:ls-support-alerts",
 ]
 
-# ── KMS key administrators ────────────────────────────────────────────────────
 key_admin_arns = [
   # "arn:aws:iam::014848577183:role/G-ROLE-AWS-RETAILCONNECTDEV-FSA",
 ]

@@ -29,15 +29,10 @@ module "connect" {
   media_stream_retention_hours     = 24
   log_retention_days               = 365
 
-  # ── Bring-your-own resources (leave "" to auto-create) ───────────────────────
-  existing_kms_s3_arn              = var.existing_kms_s3_arn
-  existing_kms_kinesis_arn         = var.existing_kms_kinesis_arn
-  existing_kms_connect_arn         = var.existing_kms_connect_arn
-  existing_s3_call_recordings_id   = var.existing_s3_call_recordings_id
-  existing_s3_scheduled_reports_id = var.existing_s3_scheduled_reports_id
-  existing_s3_chat_transcripts_id  = var.existing_s3_chat_transcripts_id
-  existing_kinesis_ctr_arn         = var.existing_kinesis_ctr_arn
-  existing_kinesis_media_arn       = var.existing_kinesis_media_arn
+  # ── KMS keys (still separate — KMS is infrastructure, not a storage config) ──
+  existing_kms_s3_arn      = var.existing_kms_s3_arn
+  existing_kms_kinesis_arn = var.existing_kms_kinesis_arn
+  existing_kms_connect_arn = var.existing_kms_connect_arn
 
   # ── Storage config overrides ─────────────────────────────────────────────────
   storage_overrides = var.storage_overrides

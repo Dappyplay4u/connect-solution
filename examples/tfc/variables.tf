@@ -39,46 +39,24 @@ variable "aws_region_abbr" {
   type        = string
 }
 
-# ── Bring-your-own resources ──────────────────────────────────────────────────
+# ── KMS keys — still separate (KMS is infrastructure, not a storage config) ───
 
 variable "existing_kms_s3_arn" {
-  type    = string
-  default = ""
+  description = "Existing KMS key ARN for S3 encryption. Leave empty to auto-create."
+  type        = string
+  default     = ""
 }
 
 variable "existing_kms_kinesis_arn" {
-  type    = string
-  default = ""
+  description = "Existing KMS key ARN for Kinesis encryption. Leave empty to auto-create."
+  type        = string
+  default     = ""
 }
 
 variable "existing_kms_connect_arn" {
-  type    = string
-  default = ""
-}
-
-variable "existing_s3_call_recordings_id" {
-  type    = string
-  default = ""
-}
-
-variable "existing_s3_scheduled_reports_id" {
-  type    = string
-  default = ""
-}
-
-variable "existing_s3_chat_transcripts_id" {
-  type    = string
-  default = ""
-}
-
-variable "existing_kinesis_ctr_arn" {
-  type    = string
-  default = ""
-}
-
-variable "existing_kinesis_media_arn" {
-  type    = string
-  default = ""
+  description = "Existing KMS key ARN for Connect CW logs. Leave empty to auto-create."
+  type        = string
+  default     = ""
 }
 
 # ── Storage config overrides ──────────────────────────────────────────────────
@@ -88,13 +66,19 @@ variable "existing_kinesis_media_arn" {
 variable "storage_overrides" {
   type = object({
     call_recordings = optional(object({
+      bucket_name   = optional(string)
       bucket_prefix = optional(string)
     }), {})
     scheduled_reports = optional(object({
+      bucket_name   = optional(string)
       bucket_prefix = optional(string)
     }), {})
     chat_transcripts = optional(object({
+      bucket_name   = optional(string)
       bucket_prefix = optional(string)
+    }), {})
+    contact_trace_records = optional(object({
+      stream_arn = optional(string)
     }), {})
     media_streams = optional(object({
       prefix                 = optional(string)

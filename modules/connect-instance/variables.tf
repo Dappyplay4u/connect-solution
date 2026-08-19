@@ -158,21 +158,34 @@ variable "alarm_sns_topic_arns" {
 variable "storage_overrides" {
   description = <<-EOT
     Per-resource storage config overrides. Set only the fields that differ from
-    the module defaults. Correct values can be read from state:
+    the module defaults. Both bucket/stream identity (name/ARN) and Connect
+    storage config attributes (prefix, retention) can be overridden here.
+
+    Reading current values from state before setting:
       terraform state show 'module.connect.aws_connect_instance_storage_config.call_recordings'
+      terraform state show 'module.connect.aws_connect_instance_storage_config.media_streams'
   EOT
   type = object({
+    # ── S3 storage configs ───────────────────────────────────────────────────
     call_recordings = optional(object({
-      bucket_prefix = optional(string) # default: "call-recordings"
+      bucket_name   = optional(string) # use existing bucket; skips S3 module creation
+      bucket_prefix = optional(string) # S3 folder path in Connect config. default: "call-recordings"
     }), {})
     scheduled_reports = optional(object({
+      bucket_name   = optional(string) # use existing bucket; skips S3 module creation
       bucket_prefix = optional(string) # default: "scheduled-reports"
     }), {})
     chat_transcripts = optional(object({
+      bucket_name   = optional(string) # use existing bucket; skips S3 module creation
       bucket_prefix = optional(string) # default: "chat-transcripts"
     }), {})
+    # ── Kinesis Data Stream (CTR / agent events) ──────────────────────────────
+    contact_trace_records = optional(object({
+      stream_arn = optional(string) # use existing Kinesis Data Stream; skips Kinesis module creation
+    }), {})
+    # ── Kinesis Video Stream (media streams) ─────────────────────────────────
     media_streams = optional(object({
-      prefix                 = optional(string) # default: "<name_prefix>-media"
+      prefix                 = optional(string) # KVS stream name prefix in Connect config. default: "<name_prefix>-media"
       retention_period_hours = optional(number) # default: var.media_stream_retention_hours
     }), {})
   })
