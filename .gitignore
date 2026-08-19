@@ -10,6 +10,7 @@
 # Variable files with secrets
 *.tfvars
 !example.tfvars
+!examples/**/envs/**/*.tfvars
 
 # Crash logs
 crash.log

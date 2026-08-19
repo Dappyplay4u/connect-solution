@@ -1,0 +1,61 @@
+###############################################################################
+# TFC Business Unit — Connect Instance Example
+#
+# Naming pattern : tfc-retail-connect-tccivr-<env>-<region_abbr>
+# Instance alias : retail-<env>-<region_abbr>
+#
+# Run from this directory:
+#   terraform init
+#   terraform plan -var-file="envs/qa-ue1/terraform.tfvars"
+#   terraform apply -var-file="envs/qa-ue1/terraform.tfvars"
+###############################################################################
+
+module "connect" {
+  source = "../../modules/connect-instance"
+
+  # ── Region ──────────────────────────────────────────────────────────────────
+  aws_region = var.aws_region
+
+  # ── Naming ──────────────────────────────────────────────────────────────────
+  project_spec    = var.project_spec    # used in instance alias: retail-qa-ue1
+  project_name    = var.project_name    # tfc
+  account         = var.account         # retail
+  lob             = var.lob             # tccivr
+  sdlc_env        = var.sdlc_env        # prod | qa | test
+  aws_region_abbr = var.aws_region_abbr # ue1 | uw2
+
+  # ── Connect feature flags ────────────────────────────────────────────────────
+  auto_resolve_best_voices_enabled = true
+  media_stream_retention_hours     = 24
+  log_retention_days               = 365
+
+  # ── Bring-your-own resources (leave "" to auto-create) ───────────────────────
+  existing_kms_s3_arn              = var.existing_kms_s3_arn
+  existing_kms_kinesis_arn         = var.existing_kms_kinesis_arn
+  existing_kms_connect_arn         = var.existing_kms_connect_arn
+  existing_s3_call_recordings_id   = var.existing_s3_call_recordings_id
+  existing_s3_scheduled_reports_id = var.existing_s3_scheduled_reports_id
+  existing_s3_chat_transcripts_id  = var.existing_s3_chat_transcripts_id
+  existing_kinesis_ctr_arn         = var.existing_kinesis_ctr_arn
+  existing_kinesis_media_arn       = var.existing_kinesis_media_arn
+
+  # ── Storage prefix overrides ─────────────────────────────────────────────────
+  # Set these when the Connect instance was previously configured with different
+  # S3 folder paths or a different Kinesis Video Stream prefix.
+  # Leave null in regions where resources are newly created by this module.
+  call_recordings_bucket_prefix   = var.call_recordings_bucket_prefix
+  scheduled_reports_bucket_prefix = var.scheduled_reports_bucket_prefix
+  chat_transcripts_bucket_prefix  = var.chat_transcripts_bucket_prefix
+  media_streams_prefix            = var.media_streams_prefix
+
+  # ── KMS admin ARNs ───────────────────────────────────────────────────────────
+  key_admin_arns = var.key_admin_arns
+
+  # ── Kinesis settings ─────────────────────────────────────────────────────────
+  kinesis_stream_mode     = "ON_DEMAND"
+  kinesis_retention_hours = 24
+  enable_firehose_ctr     = true
+
+  # ── CloudWatch alarm notifications ───────────────────────────────────────────
+  alarm_sns_topic_arns = var.alarm_sns_topic_arns
+}

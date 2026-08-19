@@ -34,8 +34,8 @@ variable "sdlc_env" {
   description = "Deployment environment: prod | qa | test"
   type        = string
   validation {
-    condition     = contains(["prod", "qa", "test"], var.sdlc_env)
-    error_message = "sdlc_env must be prod, qa, or test."
+    condition     = contains(["prod", "qa", "test", "dev"], var.sdlc_env)
+    error_message = "sdlc_env must be one of: prod, qa, test, dev."
   }
 }
 
@@ -147,4 +147,33 @@ variable "alarm_sns_topic_arns" {
   description = "SNS topic ARNs for Kinesis CloudWatch alarms"
   type        = list(string)
   default     = []
+}
+
+# ── Storage prefix overrides ──────────────────────────────────────────────────
+# Use these when the Connect instance was previously configured with different
+# S3 folder paths or a different Kinesis Video Stream prefix. Leaving them null
+# uses the module defaults, which is correct for new deployments.
+
+variable "call_recordings_bucket_prefix" {
+  description = "S3 folder prefix for call recordings in Connect storage config. Default: 'call-recordings'."
+  type        = string
+  default     = null
+}
+
+variable "scheduled_reports_bucket_prefix" {
+  description = "S3 folder prefix for scheduled reports in Connect storage config. Default: 'scheduled-reports'."
+  type        = string
+  default     = null
+}
+
+variable "chat_transcripts_bucket_prefix" {
+  description = "S3 folder prefix for chat transcripts in Connect storage config. Default: 'chat-transcripts'."
+  type        = string
+  default     = null
+}
+
+variable "media_streams_prefix" {
+  description = "Kinesis Video Stream prefix for media streams in Connect storage config. Default: '<name_prefix>-media'."
+  type        = string
+  default     = null
 }

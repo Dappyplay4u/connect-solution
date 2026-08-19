@@ -128,7 +128,7 @@ resource "aws_connect_instance_storage_config" "call_recordings" {
 
     s3_config {
       bucket_name   = local.s3_call_recordings_id
-      bucket_prefix = "call-recordings"
+      bucket_prefix = local.call_recordings_prefix
 
       encryption_config {
         encryption_type = "KMS"
@@ -151,7 +151,7 @@ resource "aws_connect_instance_storage_config" "scheduled_reports" {
 
     s3_config {
       bucket_name   = local.s3_scheduled_reports_id
-      bucket_prefix = "scheduled-reports"
+      bucket_prefix = local.scheduled_reports_prefix
 
       encryption_config {
         encryption_type = "KMS"
@@ -174,7 +174,7 @@ resource "aws_connect_instance_storage_config" "chat_transcripts" {
 
     s3_config {
       bucket_name   = local.s3_chat_transcripts_id
-      bucket_prefix = "chat-transcripts"
+      bucket_prefix = local.chat_transcripts_prefix
 
       encryption_config {
         encryption_type = "KMS"
@@ -213,7 +213,7 @@ resource "aws_connect_instance_storage_config" "media_streams" {
     storage_type = "KINESIS_VIDEO_STREAM"
 
     kinesis_video_stream_config {
-      prefix                 = "${local.name_prefix}-media"
+      prefix                 = local.media_streams_prefix
       retention_period_hours = var.media_stream_retention_hours
 
       encryption_config {

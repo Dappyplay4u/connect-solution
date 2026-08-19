@@ -53,4 +53,12 @@ locals {
   create_kms     = length(local.kms_keys_to_create) > 0 ? 1 : 0
   create_s3      = var.existing_s3_call_recordings_id == "" ? 1 : 0
   create_kinesis = (var.existing_kinesis_ctr_arn == "" || var.existing_kinesis_media_arn == "") ? 1 : 0
+
+  # Resolved storage prefixes — override when importing an instance that was
+  # previously configured with a different folder path or KVS prefix.
+  # New deployments should leave the vars null and pick up the defaults below.
+  call_recordings_prefix   = coalesce(var.call_recordings_bucket_prefix, "call-recordings")
+  scheduled_reports_prefix = coalesce(var.scheduled_reports_bucket_prefix, "scheduled-reports")
+  chat_transcripts_prefix  = coalesce(var.chat_transcripts_bucket_prefix, "chat-transcripts")
+  media_streams_prefix     = coalesce(var.media_streams_prefix, "${local.name_prefix}-media")
 }
